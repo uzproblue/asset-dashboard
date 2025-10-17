@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,6 +43,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-inter: Inter, sans-serif;
+  --color-brand-900: #0E0E26;
+  --color-brand-500: #2A2964;
+  --color-neutral-70: #5A5B56;
+  --color-neutral-200: #E5E6E2;
+  --color-filter:#F3F1EA1A;
+  --drop-shadow-filter: 40px 60px -30px rgba(0, 0, 0, 0.08);
+  --color-filter-row:rgba(255, 255, 255, 0.7);
+  --color-filter-section: rgba(243, 241, 234, 0.1);
 }
 
 :root {
