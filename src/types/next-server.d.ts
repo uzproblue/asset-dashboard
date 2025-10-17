@@ -1,11 +1,13 @@
 declare module "next/server" {
   export class NextResponse {
     constructor(body?: BodyInit | null, init?: ResponseInit);
-    static json(data: any, init?: ResponseInit): NextResponse;
+    static json(data: unknown, init?: ResponseInit): NextResponse;
     static text(data: string, init?: ResponseInit): NextResponse;
   }
 
-  export interface NextRequest extends Request {}
+  export interface NextRequest extends Request {
+    // NextRequest extends Request
+  }
 }
 
 declare module "next" {
@@ -22,7 +24,7 @@ declare module "next" {
   export interface Metadata {
     title?: string;
     description?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 }
 
@@ -35,7 +37,7 @@ declare module "path" {
   export function join(...paths: string[]): string;
 }
 
-declare var process: {
+declare const process: {
   cwd(): string;
   env: Record<string, string | undefined>;
 };
@@ -48,7 +50,7 @@ declare namespace React {
 
 declare namespace JSX {
   interface IntrinsicElements {
-    [elemName: string]: any;
+    [elemName: string]: object;
   }
 }
 
@@ -58,16 +60,19 @@ declare module "react" {
   ): [T, (value: T | ((prev: T) => T)) => void];
   export function useEffect(
     effect: () => void | (() => void),
-    deps?: any[]
+    deps?: unknown[]
   ): void;
-  export function useMemo<T>(factory: () => T, deps?: any[]): T;
-  export function useCallback<T extends (...args: any[]) => any>(
+  export function useMemo<T>(factory: () => T, deps?: unknown[]): T;
+  export function useCallback<T extends (...args: unknown[]) => unknown>(
     callback: T,
-    deps?: any[]
+    deps?: unknown[]
   ): T;
   export function useTransition(): [boolean, (callback: () => void) => void];
   export function memo<T>(component: T): T;
   export function useRef<T>(initialValue: T): { current: T };
   export function lazy<T>(importFunc: () => Promise<{ default: T }>): T;
-  export function Suspense(props: { children: any; fallback: any }): any;
+  export function Suspense(props: {
+    children: unknown;
+    fallback: unknown;
+  }): unknown;
 }
