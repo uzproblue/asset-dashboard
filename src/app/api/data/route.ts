@@ -3,7 +3,24 @@ import { readFileSync, statSync } from "fs";
 import { join } from "path";
 
 // Cache for the processed data
-let cachedData: any = null;
+interface OptimizedData {
+  data: any[];
+  indexes: {
+    categories: string[];
+    subcategories: string[];
+    experts: string[];
+    assets: string[];
+  };
+  groupedData: Record<string, any[]>;
+  metadata: {
+    totalRows: number;
+    totalAssets: number;
+    lastUpdated: string;
+    version: string;
+  };
+}
+
+let cachedData: OptimizedData | null = null;
 let lastModified: number = 0;
 
 export async function GET() {

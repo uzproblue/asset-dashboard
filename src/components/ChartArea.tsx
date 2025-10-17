@@ -147,13 +147,10 @@ export function ChartArea({
         mode: "index" as const,
         intersect: false,
         callbacks: {
-          title: (context: { parsed: { x: string } }[]) => {
+          title: (context: any) => {
             return new Date(context[0].parsed.x).toLocaleDateString();
           },
-          label: (context: {
-            dataset: { label: string; data: any[] };
-            dataIndex: number;
-          }) => {
+          label: (context: any) => {
             const dataset = context.dataset;
             const originalData =
               groupedData[dataset.label]?.[context.dataIndex];

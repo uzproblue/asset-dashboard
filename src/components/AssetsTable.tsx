@@ -33,6 +33,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
   }, [data, selectedAssets, searchTerm]);
 
   // Virtual scrolling setup
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: filteredData.length,
     getScrollElement: () => parentRef.current,

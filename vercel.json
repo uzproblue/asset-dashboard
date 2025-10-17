@@ -1,17 +1,12 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "yarn build",
-  "devCommand": "yarn dev",
-  "installCommand": "yarn install",
-  "outputDirectory": ".next",
   "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 10
+    "src/app/api/data/route.ts": {
+      "maxDuration": 30
     }
   },
   "headers": [
     {
-      "source": "/data/(.*)",
+      "source": "/api/data",
       "headers": [
         {
           "key": "Cache-Control",

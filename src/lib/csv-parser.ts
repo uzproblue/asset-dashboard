@@ -24,7 +24,7 @@ export function parseCSV(csvContent: string): AssetData[] {
     const values = parseCSVLine(line);
     if (values.length !== headers.length) continue;
 
-    const row: Record<string, string | number> = {};
+    const row: Partial<AssetData> = {};
     headers.forEach((header, index) => {
       const value = values[index];
 
@@ -39,9 +39,9 @@ export function parseCSV(csvContent: string): AssetData[] {
           "Round indexed_at 100",
         ].includes(header)
       ) {
-        row[header] = parseFloat(value) || 0;
+        (row as any)[header] = parseFloat(value) || 0;
       } else {
-        row[header] = value;
+        (row as any)[header] = value;
       }
     });
 
