@@ -147,12 +147,14 @@ export function ChartArea({
         mode: "index" as const,
         intersect: false,
         callbacks: {
-          title: (context: any) => {
+          title: (context: { parsed: { x: string } }[]) => {
             return new Date(context[0].parsed.x).toLocaleDateString();
           },
-          label: (context: any) => {
+          label: (context: {
+            dataset: { label: string; data: any[] };
+            dataIndex: number;
+          }) => {
             const dataset = context.dataset;
-            const dataPoint = dataset.data[context.dataIndex];
             const originalData =
               groupedData[dataset.label]?.[context.dataIndex];
 
@@ -196,7 +198,7 @@ export function ChartArea({
           color: "#E5E7EB",
         },
         ticks: {
-          callback: function (value: any) {
+          callback: function (value: number) {
             if (showIndexed) {
               return value.toFixed(1);
             }

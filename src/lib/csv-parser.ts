@@ -1,4 +1,4 @@
-import { AssetData, ProcessedAssetData, OptimizedData } from "./data";
+import { AssetData, OptimizedData } from "./data";
 
 // Parse JSON data (much faster than CSV parsing)
 export function parseJSON(jsonContent: string): OptimizedData {
@@ -24,7 +24,7 @@ export function parseCSV(csvContent: string): AssetData[] {
     const values = parseCSVLine(line);
     if (values.length !== headers.length) continue;
 
-    const row: any = {};
+    const row: Record<string, string | number> = {};
     headers.forEach((header, index) => {
       const value = values[index];
 

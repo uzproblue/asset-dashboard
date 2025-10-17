@@ -205,7 +205,10 @@ export function getChartData(
 }
 
 // Memoized chart data generation
-const chartDataCache = new Map<string, any>();
+const chartDataCache = new Map<
+  string,
+  { x: string; y: number; value_eur: number; indexed_value: number }[]
+>();
 
 export function getMemoizedChartData(
   assetData: ProcessedAssetData[],
