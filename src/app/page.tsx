@@ -195,7 +195,7 @@ function HomePage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="mx-auto max-sm:w-343/375 sm:w-638/744 lg:w-15/16 min-xl:w-300">
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
