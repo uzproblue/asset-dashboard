@@ -13,6 +13,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["react", "react-dom"],
     "plugins": [
       {
         "name": "next"
