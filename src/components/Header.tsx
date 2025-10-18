@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function Header() {
   return (
-    <header className="py-4 px-2.5">
+    <header className="py-4">
       <div className="max-w-7xl mx-auto">
         <Image
           src={Logo}

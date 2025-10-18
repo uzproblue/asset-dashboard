@@ -53,18 +53,40 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">Assets detail</h3>
-          <p className="text-sm text-gray-500">
-            {filteredData.length} assets in current selection
-          </p>
-        </div>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+    <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2">
+      {/* Table Header*/}
+      <div className="flex flex-col items-start py-5 px-6 gap-4 justify-between">
+        <button className="max-sm:w-90/100 max-sm:order-last sm:absolute top-5 right-6 rounded-xl py-2 px-3 gap-2 bg-brand-500 hover:bg-brand-900 text-sm font-medium text-white">
+          <span className="flex items-center gap-2">
             <svg
-              className="h-4 w-4 text-gray-400"
+              className="w-4 h-4 text-white"
+              fill="none"                
+              viewBox="0 0 24 24"    
+              stroke="currentColor"
+              strokeWidth={1.5}
+              strokeLinecap="round"      
+              strokeLinejoin="round" 
+            >
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" />
+              <path d="M12 10v6" />
+              <path d="M9.5 13.5L12 16l2.5-2.5" />
+            </svg>
+            Download CSV
+          </span>
+        </button>
+        <div className="flex flex-col border-b border-neutral-200 pb-4 gap-4 w-full">
+          <h3 className="text-lg font-bold text-brand-900">
+            Assets detail
+          </h3>
+          <h4 className="text-sm font-normal text-neutral-700">
+            {filteredData.length} assets in current selection
+          </h4>
+        </div>
+
+        <div className="relative max-sm:w-90/100 ">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
+            <svg
+              className="h-4 w-4 text-neutral-700"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -82,11 +104,11 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
             placeholder="Search asset"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="pl-10 px-3 py-2 w-full  border bg-neutral-50 border-neutral-200 rounded-xl text-sm font-normal text-neutral-700 placeholder-neutral-700 focus:ring-2 focus:ring-brand-100 focus:border-brand-100  hover:border-brand-100 hover:border-2 focus:outline-none"
           />
         </div>
       </div>
-
+      {/* Table Body */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -183,11 +205,10 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                       </div>
                       <div>
                         <span
-                          className={`inline-flex items-center ${
-                            performance.isPositive
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
+                          className={`inline-flex items-center ${performance.isPositive
+                            ? "text-green-600"
+                            : "text-red-600"
+                            }`}
                         >
                           {performance.isPositive ? (
                             <svg

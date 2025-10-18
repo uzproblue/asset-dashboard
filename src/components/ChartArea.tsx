@@ -7,6 +7,9 @@ import {
   translations,
   getMemoizedChartData,
 } from "@/lib/data";
+import ArrowsMaximize from "../../public/arrows-maximize.png";
+import Image from "next/image";
+
 
 // Lazy load chart components
 const Line = React.lazy(() =>
@@ -213,13 +216,13 @@ export function ChartArea({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-6">
+      <div className="bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2">
         <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-lg font-bold text-brand-900">
               Performance Chart
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm font-normal text-neutral-700">
               0 assets • No data available
             </p>
           </div>
@@ -255,52 +258,53 @@ export function ChartArea({
 
   const currentValues = getCurrentValues();
 
+  const [enabled, setEnabled] = useState(false);
+
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 bg-white/70">
       {/* Chart Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+      <div className="relative flex items-center justify-between border-b border-neutral-200 px-6 py-5 gap-6 max-md:flex-col max-md:items-start">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-lg font-bold text-brand-900">
             Performance Chart
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm font-normal text-neutral-700">
             {filteredAssets.length} assets • Data through 2024-10 •{" "}
             {showIndexed ? "Indexed value" : "Asset value"}
           </p>
         </div>
-        <div className="flex items-center space-x-4">
-          <button
+        {/*Right Side*/}
+        <div className="flex gap-4 items-center justify-between pr-10 ">
+          {/* Toggle Switch */}
+
+          <button className="rounded-4xl"
             onClick={() => onToggleIndexed(!showIndexed)}
-            className={`px-3 py-1 text-sm rounded-md transition-colors ${
-              showIndexed
-                ? "bg-blue-100 text-blue-700 border border-blue-300"
-                : "bg-gray-100 text-gray-700 border border-gray-300"
-            }`}
           >
-            Index to 100 at release
-          </button>
-          <button className="text-gray-400 hover:text-gray-600">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <div
+              onClick={() => setEnabled(!enabled)}
+              className={`w-10 h-5 rounded-4xl relative cursor-pointer transition-colors
+              ${enabled ? "bg-brand-500" : "bg-neutral-200"}`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+              <span
+                className={`absolute w-4 h-4 top-0.5 rounded-4xl bg-white transition-all
+              ${enabled ? "left-[22px]" : "left-[2px]"}`}
               />
-            </svg>
+            </div>
           </button>
+          <p className="flex-nowrap leading-tight  font-medium text-sm transition-colors align-middle min-h-4">
+            Index to 100 at release
+          </p>
         </div>
+        <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">
+          <Image src={ArrowsMaximize} alt="maximize" className="absolute md:top-2 w-4 h-4" />
+        </button>
       </div>
 
       {/* Chart with Custom Legend */}
-      <div className="flex">
-        <div className="flex-1">
-          <div className="h-96 bg-gray-50 rounded-lg">
+      <div className="flex flex-col">
+        <div className="border-b border-neutral-200 py-5 px-6 gap-5 bg-white/70">
+          <div className="  relative h-96">
             {chartReady ? (
               <Suspense
                 fallback={
@@ -330,14 +334,14 @@ export function ChartArea({
         </div>
 
         {/* Custom Legend */}
-        <div className="w-48 ml-6 flex flex-col justify-center space-y-3">
+        <div className="w-full flex py-4 px-6 gap-2 bg-white/70 flex-wrap">
           {filteredAssets.map((asset, index) => {
             const colors = [
-              "#8B5CF6",
-              "#F59E0B",
-              "#10B981",
-              "#EC4899",
-              "#3B82F6",
+              "#C084FC",
+              "#FB923C",
+              "#2DD4BF",
+              "#F472B6",
+              "#38BDF8",
               "#EF4444",
               "#06B6D4",
               "#84CC16",
@@ -348,13 +352,13 @@ export function ChartArea({
             const value = currentValues[asset];
 
             return (
-              <div key={asset} className="flex items-center space-x-3">
+              <div key={asset} className="flex items-center gap-1">
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: color }}
                 />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">
+                <div className="w-full flex gap-1 flex-col flex-wrap" >
+                  <div className="text-sm font-normal text-neutral-900 align-right min-sm:min-w-80">
                     {asset}
                   </div>
                   <div className="text-sm text-gray-500">
