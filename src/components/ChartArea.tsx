@@ -168,17 +168,10 @@ export function ChartArea({
         },
         callbacks: {
           title: (context: any) => {
-            // The x value is a formatted date string (YYYY-MM-DD)
-            const dateStr = context[0].parsed.x;
-            if (dateStr && typeof dateStr === "string") {
-              const date = new Date(dateStr);
-              if (!isNaN(date.getTime())) {
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                });
-              }
+            // The x value is now a sequential data point number
+            const dataPoint = context[0].parsed.x;
+            if (typeof dataPoint === "number") {
+              return `Data Point ${dataPoint}`;
             }
             return "";
           },
@@ -210,14 +203,18 @@ export function ChartArea({
     },
     scales: {
       x: {
-        type: "category" as const,
+        type: "linear" as const,
         title: {
           display: true,
-          text: t.date,
+          text: "Data Point",
         },
         grid: {
           display: true,
           color: "#E5E7EB",
+        },
+        ticks: {
+          stepSize: 1,
+          callback: (value: any) => value.toString(),
         },
       },
       y: {

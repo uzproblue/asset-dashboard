@@ -131,13 +131,30 @@ function groupDataByAsset(data) {
     grouped[item.asset_en].push(item);
   });
 
-  // Sort each group by date
+  // Sort each group by date and add sequence numbers
   Object.keys(grouped).forEach((asset) => {
+    // Sort by date (ascending)
     grouped[asset].sort(
       (a, b) =>
         new Date(a.price_date_formatted).getTime() -
         new Date(b.price_date_formatted).getTime()
     );
+
+    // Add sequence numbers and recalculate indexed values from first point
+    const assetData = grouped[asset];
+    if (assetData.length > 0) {
+      // Get the first (issuance) value for indexing
+      const firstValue = assetData[0].value_eur;
+
+      assetData.forEach((item, index) => {
+        // Add sequence number (1-based)
+        item.sequence = index + 1;
+
+        // Recalculate indexed value from first point (issuance)
+        item.indexed_value =
+          firstValue > 0 ? (item.value_eur / firstValue) * 100 : 100;
+      });
+    }
   });
 
   return grouped;
