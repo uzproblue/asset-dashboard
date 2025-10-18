@@ -1,18 +1,24 @@
 const fs = require("fs");
 const path = require("path");
 
-// Convert Excel date number to JavaScript Date
-function excelDateToJSDate(excelDate) {
-  const excelEpoch = new Date(1900, 0, 1);
-  const jsDate = new Date(
-    excelEpoch.getTime() + (excelDate - 2) * 24 * 60 * 60 * 1000
-  );
-  return jsDate;
-}
-
 // Format date for display
 function formatDate(date) {
   return date.toLocaleDateString("en-CA"); // YYYY-MM-DD format
+}
+
+// Parse date strings in MM/DD/YY or MM/DD/YYYY format
+function parseDateString(dateStr) {
+  if (!dateStr || typeof dateStr !== "string") return null;
+
+  const match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (match) {
+    let [, month, day, year] = match;
+    year = parseInt(year);
+    year = year.toString().length === 2 ? 2000 + year : year;
+    return new Date(year, parseInt(month) - 1, parseInt(day));
+  }
+
+  return null;
 }
 
 // Parse CSV line handling quotes properly
@@ -56,12 +62,10 @@ function parseCSV(csvContent) {
     headers.forEach((header, index) => {
       const value = values[index];
 
-      // Convert numeric fields
+      // Convert numeric fields ONLY (not dates)
       if (
         [
-          "price_date",
           "value_eur",
-          "release_date",
           "issuance_value_eur",
           "number_of_splints",
           "Round indexed_at 100",
@@ -81,12 +85,17 @@ function parseCSV(csvContent) {
 
 // Process asset data with pre-calculated values
 function processAssetData(rawData) {
-  return rawData.map((item) => ({
-    ...item,
-    price_date_formatted: formatDate(excelDateToJSDate(item.price_date)),
-    release_date_formatted: formatDate(excelDateToJSDate(item.release_date)),
-    indexed_value: item["Round indexed_at 100"],
-  }));
+  return rawData.map((item) => {
+    const priceDate = parseDateString(item.price_date);
+    const releaseDate = parseDateString(item.release_date);
+
+    return {
+      ...item,
+      price_date_formatted: priceDate ? formatDate(priceDate) : null,
+      release_date_formatted: releaseDate ? formatDate(releaseDate) : null,
+      indexed_value: item["Round indexed_at 100"],
+    };
+  });
 }
 
 // Create efficient indexes for filtering
