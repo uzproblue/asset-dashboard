@@ -149,12 +149,14 @@ function preprocessCSV() {
     console.log("Starting CSV preprocessing...");
 
     const csvPath = path.join(process.cwd(), "public", "data", "assets.csv");
-    const outputPath = path.join(
-      process.cwd(),
-      "public",
-      "data",
-      "assets.json"
-    );
+    const outputDir = path.join(process.cwd(), "public", "data");
+    const outputPath = path.join(outputDir, "assets.json");
+    const chunksDir = path.join(outputDir, "chunks");
+
+    // Create chunks directory if it doesn't exist
+    if (!fs.existsSync(chunksDir)) {
+      fs.mkdirSync(chunksDir, { recursive: true });
+    }
 
     // Read CSV file
     const csvContent = fs.readFileSync(csvPath, "utf-8");
@@ -176,7 +178,43 @@ function preprocessCSV() {
     const groupedData = groupDataByAsset(processedData);
     console.log(`Grouped data for ${Object.keys(groupedData).length} assets`);
 
-    // Create optimized output
+    // Create chunks for large datasets (10k rows per chunk)
+    const CHUNK_SIZE = 10000;
+    const totalChunks = Math.ceil(processedData.length / CHUNK_SIZE);
+    console.log(`Creating ${totalChunks} chunks of ${CHUNK_SIZE} rows each`);
+
+    // Write chunk files
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, processedData.length);
+      const chunkData = processedData.slice(start, end);
+
+      const chunkPath = path.join(chunksDir, `assets-chunk-${i + 1}.json`);
+      fs.writeFileSync(chunkPath, JSON.stringify(chunkData, null, 2));
+      console.log(
+        `Created chunk ${i + 1}/${totalChunks}: ${chunkData.length} rows`
+      );
+    }
+
+    // Create metadata file (indexes only)
+    const metadata = {
+      indexes,
+      groupedData,
+      metadata: {
+        totalRows: processedData.length,
+        totalAssets: Object.keys(groupedData).length,
+        totalChunks,
+        chunkSize: CHUNK_SIZE,
+        lastUpdated: new Date().toISOString(),
+        version: "2.0",
+      },
+    };
+
+    const metadataPath = path.join(outputDir, "assets-metadata.json");
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    console.log(`Created metadata file: ${metadataPath}`);
+
+    // Create optimized output (for backward compatibility)
     const optimizedData = {
       data: processedData,
       indexes,
@@ -185,12 +223,12 @@ function preprocessCSV() {
         totalRows: processedData.length,
         totalAssets: Object.keys(groupedData).length,
         lastUpdated: new Date().toISOString(),
-        version: "1.0",
+        version: "2.0",
       },
     };
 
-    // Write JSON file
-    fs.writeFileSync(outputPath, JSON.stringify(optimizedData, null, 2));
+    // Write JSON file (compressed)
+    fs.writeFileSync(outputPath, JSON.stringify(optimizedData));
 
     const originalSize = fs.statSync(csvPath).size;
     const newSize = fs.statSync(outputPath).size;

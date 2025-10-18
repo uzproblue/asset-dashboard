@@ -204,11 +204,17 @@ export function getChartData(
   }));
 }
 
-// Memoized chart data generation
+// Memoized chart data generation with size limit
 const chartDataCache = new Map<
   string,
   { x: string; y: number; value_eur: number; indexed_value: number }[]
 >();
+
+// Clear cache when it gets too large (prevent memory leaks)
+const MAX_CACHE_SIZE = 50;
+if (chartDataCache.size > MAX_CACHE_SIZE) {
+  chartDataCache.clear();
+}
 
 export function getMemoizedChartData(
   assetData: ProcessedAssetData[],
@@ -230,4 +236,10 @@ export function getMemoizedChartData(
 // Clear cache when needed
 export function clearChartDataCache() {
   chartDataCache.clear();
+}
+
+// Clear all caches for memory management
+export function clearAllCaches() {
+  chartDataCache.clear();
+  // Clear any other caches here
 }

@@ -121,7 +121,7 @@ export function ChartArea({
     ];
 
     // Use memoized chart data with downsampling for performance
-    const chartData = getMemoizedChartData(assetData, showIndexed, 100);
+    const chartData = getMemoizedChartData(assetData, showIndexed, 50);
 
     return {
       label: asset,

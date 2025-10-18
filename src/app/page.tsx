@@ -25,7 +25,7 @@ import {
   groupDataByAsset,
 } from "@/lib/data";
 import { parseCSV, parseJSON } from "@/lib/csv-parser";
-import { debounce } from "@/lib/performance"; 
+import { debounce } from "@/lib/performance";
 
 function HomePage() {
   const [optimizedData, setOptimizedData] = useState<OptimizedData | null>(
@@ -50,19 +50,41 @@ function HomePage() {
 
   const t = translations[language];
 
-  // Load data on component mount
+  // Load data on component mount with chunked loading
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Try API first (now serves JSON)
-        const response = await fetch("/api/data");
-        if (!response.ok) {
-          throw new Error("API failed");
+        // Try metadata API first (lightweight)
+        const metadataResponse = await fetch("/api/data/metadata");
+        if (metadataResponse.ok) {
+          const metadataText = await metadataResponse.text();
+          const metadata = parseJSON(metadataText);
+          setOptimizedData(metadata);
+
+          // Load first chunk immediately for fast initial render
+          const firstChunkResponse = await fetch("/api/data/chunks?page=1");
+          if (firstChunkResponse.ok) {
+            const chunkText = await firstChunkResponse.text();
+            const firstChunk = parseJSON(chunkText);
+            setProcessedData(firstChunk);
+
+            // Load remaining chunks in background
+            const totalChunks = metadata.metadata.totalChunks || 1;
+            if (totalChunks > 1) {
+              loadRemainingChunks(totalChunks, firstChunk);
+            }
+          }
+        } else {
+          // Fallback to full data API
+          const response = await fetch("/api/data");
+          if (!response.ok) {
+            throw new Error("API failed");
+          }
+          const jsonText = await response.text();
+          const parsed = parseJSON(jsonText);
+          setOptimizedData(parsed);
+          setProcessedData(parsed.data);
         }
-        const jsonText = await response.text();
-        const parsed = parseJSON(jsonText);
-        setOptimizedData(parsed);
-        setProcessedData(parsed.data);
       } catch (error) {
         console.error("Error loading data:", error);
         // Fallback: try to load CSV from public folder
@@ -81,6 +103,33 @@ function HomePage() {
         }
       } finally {
         setLoading(false);
+      }
+    };
+
+    // Load remaining chunks in background
+    const loadRemainingChunks = async (
+      totalChunks: number,
+      initialData: ProcessedAssetData[]
+    ) => {
+      const allData = [...initialData];
+
+      for (let i = 2; i <= totalChunks; i++) {
+        try {
+          const chunkResponse = await fetch(`/api/data/chunks?page=${i}`);
+          if (chunkResponse.ok) {
+            const chunkText = await chunkResponse.text();
+            const chunk = parseJSON(chunkText);
+            allData.push(...chunk);
+
+            // Update data progressively
+            setProcessedData([...allData]);
+
+            // Small delay to prevent overwhelming the UI
+            await new Promise((resolve) => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          console.error(`Error loading chunk ${i}:`, error);
+        }
       }
     };
 
@@ -216,7 +265,6 @@ function HomePage() {
 
           <div className="pt-5">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          
               <FilterSelect
                 options={categories}
                 selectedValues={selectedCategories}
@@ -254,7 +302,9 @@ function HomePage() {
               />
 
               <div className="relative">
-                <p className="text-sm font-medium text-neutral-900">Date range</p>
+                <p className="text-sm font-medium text-neutral-900">
+                  Date range
+                </p>
                 <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
                   <span className="flex items-center">
                     <svg
