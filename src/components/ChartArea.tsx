@@ -10,7 +10,6 @@ import {
 import ArrowsMaximize from "../../public/arrows-maximize.png";
 import Image from "next/image";
 
-
 // Lazy load chart components
 const Line = React.lazy(() =>
   import("react-chartjs-2").then((module) => ({ default: module.Line }))
@@ -36,6 +35,8 @@ const initializeChart = async () => {
     Filler,
     TimeScale,
   } = chartModule;
+
+  // Note: Time adapter not installed, using category scale instead
 
   ChartJS.register(
     CategoryScale,
@@ -107,16 +108,16 @@ export function ChartArea({
   const datasets = filteredAssets.map((asset: string, index: number) => {
     const assetData = groupedData[asset];
     const colors = [
-      "#3B82F6",
-      "#EF4444",
-      "#10B981",
-      "#F59E0B",
-      "#8B5CF6",
-      "#EC4899",
-      "#06B6D4",
-      "#84CC16",
-      "#F97316",
-      "#6366F1",
+      "#A78BFA", // Purple/Lavender
+      "#FB923C", // Orange
+      "#14B8A6", // Teal/Aqua
+      "#F472B6", // Pink
+      "#3B82F6", // Blue
+      "#10B981", // Green (fallback)
+      "#F59E0B", // Yellow (fallback)
+      "#EF4444", // Red (fallback)
+      "#8B5CF6", // Purple (fallback)
+      "#06B6D4", // Cyan (fallback)
     ];
 
     // Use memoized chart data with downsampling for performance
@@ -149,9 +150,37 @@ export function ChartArea({
       tooltip: {
         mode: "index" as const,
         intersect: false,
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        titleColor: "#1f2937",
+        bodyColor: "#1f2937",
+        borderColor: "transparent",
+        borderWidth: 0,
+        cornerRadius: 12,
+        displayColors: true,
+        padding: 12,
+        titleFont: {
+          size: 14,
+          weight: "600",
+        },
+        bodyFont: {
+          size: 13,
+          weight: "400",
+        },
         callbacks: {
           title: (context: any) => {
-            return new Date(context[0].parsed.x).toLocaleDateString();
+            // The x value is a formatted date string (YYYY-MM-DD)
+            const dateStr = context[0].parsed.x;
+            if (dateStr && typeof dateStr === "string") {
+              const date = new Date(dateStr);
+              if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                });
+              }
+            }
+            return "";
           },
           label: (context: any) => {
             const dataset = context.dataset;
@@ -160,11 +189,21 @@ export function ChartArea({
 
             if (!originalData) return "";
 
-            return [
-              `${dataset.label}`,
-              `${t.value}: €${originalData.value_eur.toLocaleString()}`,
-              `${t.indexedValue}: ${originalData.indexed_value.toFixed(2)}`,
-            ];
+            const value = showIndexed
+              ? originalData.indexed_value.toFixed(2)
+              : `€${originalData.value_eur.toLocaleString()}`;
+
+            return `${dataset.label}: ${value}`;
+          },
+          labelColor: (context: any) => {
+            return {
+              borderColor: "transparent",
+              backgroundColor: context.dataset.borderColor,
+              borderWidth: 0,
+              borderRadius: 6,
+              width: 8,
+              height: 8,
+            };
           },
         },
       },
@@ -172,13 +211,6 @@ export function ChartArea({
     scales: {
       x: {
         type: "category" as const,
-        // time: {
-        //   parser: "yyyy-MM-dd",
-        //   displayFormats: {
-        //     day: "MMM dd",
-        //     month: "MMM yyyy",
-        //   },
-        // },
         title: {
           display: true,
           text: t.date,
@@ -260,7 +292,6 @@ export function ChartArea({
 
   const [enabled, setEnabled] = useState(false);
 
-
   return (
     <div className="rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 bg-white/70">
       {/* Chart Header */}
@@ -278,7 +309,8 @@ export function ChartArea({
         <div className="flex gap-4 items-center justify-between pr-10 ">
           {/* Toggle Switch */}
 
-          <button className="rounded-4xl"
+          <button
+            className="rounded-4xl"
             onClick={() => onToggleIndexed(!showIndexed)}
           >
             <div
@@ -297,7 +329,11 @@ export function ChartArea({
           </p>
         </div>
         <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">
-          <Image src={ArrowsMaximize} alt="maximize" className="absolute md:top-2 w-4 h-4" />
+          <Image
+            src={ArrowsMaximize}
+            alt="maximize"
+            className="absolute md:top-2 w-4 h-4"
+          />
         </button>
       </div>
 
@@ -357,7 +393,7 @@ export function ChartArea({
                   className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: color }}
                 />
-                <div className="w-full flex gap-1 flex-col flex-wrap" >
+                <div className="w-full flex gap-1 flex-col flex-wrap">
                   <div className="text-sm font-normal text-neutral-900 align-right min-sm:min-w-80">
                     {asset}
                   </div>
