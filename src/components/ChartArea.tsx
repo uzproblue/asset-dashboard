@@ -205,8 +205,7 @@ export function ChartArea({
       x: {
         type: "linear" as const,
         title: {
-          display: true,
-          text: "Data Point",
+          display: false,
         },
         grid: {
           display: true,
@@ -219,8 +218,7 @@ export function ChartArea({
       },
       y: {
         title: {
-          display: true,
-          text: showIndexed ? t.indexedValue : t.value,
+          display: false,
         },
         grid: {
           display: true,
@@ -231,7 +229,14 @@ export function ChartArea({
             if (showIndexed) {
               return value.toFixed(1);
             }
-            return "€" + value.toLocaleString();
+            // Format large numbers with k, M suffixes
+            if (value >= 1000000) {
+              return "€" + (value / 1000000).toFixed(1) + "M";
+            } else if (value >= 1000) {
+              return "€" + (value / 1000).toFixed(0) + "k";
+            } else {
+              return "€" + value.toFixed(0);
+            }
           },
         },
       },
@@ -394,11 +399,11 @@ export function ChartArea({
                   <div className="text-sm font-normal text-neutral-900 align-right min-sm:min-w-80">
                     {asset}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  {/* <div className="text-sm text-gray-500">
                     {showIndexed
                       ? value?.toFixed(1)
                       : `€${value?.toLocaleString() || "0"}`}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             );
