@@ -265,41 +265,89 @@ function HomePage() {
 
           <div className="pt-5">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <FilterSelect
-                options={categories}
-                selectedValues={selectedCategories}
-                onSelectionChange={debouncedSetCategories}
-                label="Category"
-                language={language}
-                placeholder="Select item"
-              />
+              {activeTab === "search" ? (
+                <>
+                  <FilterSelect
+                    options={categories}
+                    selectedValues={selectedCategories}
+                    onSelectionChange={debouncedSetCategories}
+                    label="Category"
+                    language={language}
+                    placeholder="Select item"
+                  />
 
-              <FilterSelect
-                options={subcategories}
-                selectedValues={selectedSubcategories}
-                onSelectionChange={debouncedSetSubcategories}
-                label="Subcategory"
-                language={language}
-                placeholder="Select subcategory"
-              />
+                  <FilterSelect
+                    options={subcategories}
+                    selectedValues={selectedSubcategories}
+                    onSelectionChange={debouncedSetSubcategories}
+                    label="Subcategory"
+                    language={language}
+                    placeholder="Select subcategory"
+                  />
 
-              <FilterSelect
-                options={experts}
-                selectedValues={selectedExperts}
-                onSelectionChange={debouncedSetExperts}
-                label="Expert"
-                language={language}
-                placeholder="Select subcategory"
-              />
+                  <FilterSelect
+                    options={experts}
+                    selectedValues={selectedExperts}
+                    onSelectionChange={debouncedSetExperts}
+                    label="Expert"
+                    language={language}
+                    placeholder="Select subcategory"
+                  />
 
-              <FilterSelect
-                options={availableAssets}
-                selectedValues={selectedAssets}
-                onSelectionChange={debouncedSetAssets}
-                label="Asset"
-                language={language}
-                placeholder="Select asset"
-              />
+                  <FilterSelect
+                    options={availableAssets}
+                    selectedValues={selectedAssets}
+                    onSelectionChange={debouncedSetAssets}
+                    label="Asset"
+                    language={language}
+                    placeholder="Select asset"
+                  />
+
+                  <div className="relative">
+                    <p className="text-sm font-medium text-neutral-900">Date range</p>
+                    <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
+                      <span className="flex items-center">
+                        <svg
+                          className="w-4 h-4 mr-2 text-neutral-700"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Select range
+                      </span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="relative">
+                  <p className="text-sm font-medium text-neutral-900">Date range</p>
+                  <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-2 mt-2 focus:ring-1 focus:border-brand-100 focus:ring-inset focus:ring-brand-100 text-neutral-700">
+                    <span className="flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-2 text-neutral-700"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Select range
+                    </span>
+                  </button>
+                </div>
+              )}
 
               <div className="relative">
                 <p className="text-sm font-medium text-neutral-900">
