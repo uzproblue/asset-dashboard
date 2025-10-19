@@ -43,11 +43,13 @@ export function FilterSelect({
   return (
     <div className="relative">
       <div className="relative">
-        <p className="text-sm font-medium text-neutral-900">{label}</p>
+        <p className="text-sm font-medium text-neutral-900">
+          {label}
+        </p>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm hover:border-brand-100 hover:border-2 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-100 text-neutral-700 mt-2"
+          className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm hover:border-brand-100 hover:border-2 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-100 text-neutral-700 mt-2 focus:ring-inset"
         >
           <div className="flex items-center gap-4" >
             <span className={selectedValues.length === 0
@@ -59,7 +61,7 @@ export function FilterSelect({
             </span>
 
           </div>
-          <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none h-4 top-9.5 ">
+          <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none h-4 top-9.5">
             <svg
               className={`w-4 h-4 text-neutral-700
                 transition-transform ${isOpen ? "rotate-180" : ""
