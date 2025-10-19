@@ -279,7 +279,7 @@ function HomePage() {
               ) : (
                 <div className="relative">
                   <p className="text-sm font-medium text-neutral-900">Date range</p>
-                  <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
+                  <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-2 mt-2 focus:ring-1 focus:border-brand-100 focus:ring-inset focus:ring-brand-100 text-neutral-700">
                     <span className="flex items-center">
                       <svg
                         className="w-4 h-4 mr-2 text-neutral-700"

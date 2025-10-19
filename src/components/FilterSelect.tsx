@@ -49,7 +49,7 @@ export function FilterSelect({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm hover:border-brand-100 hover:border-2 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-100 text-neutral-700 mt-2 focus:ring-inset"
+          className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm hover:border-brand-100 focus:inline focus:ring-2 focus:ring-brand-100 focus:border-brand-100 text-neutral-700 mt-2 focus:ring-inset"
         >
           <div className="flex items-center gap-4" >
             <span className={selectedValues.length === 0
