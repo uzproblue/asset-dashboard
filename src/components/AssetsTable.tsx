@@ -32,13 +32,13 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
       );
   }, [data, selectedAssets, searchTerm]);
 
-  // Virtual scrolling setup
+  // Virtual scrolling setup - optimized for performance
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: filteredData.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 50, // Row height
-    overscan: 10, // Render extra items for smooth scrolling
+    estimateSize: () => 45, // Reduced row height for better performance
+    overscan: 3, // Reduced overscan for better memory usage
   });
 
   // Calculate performance percentage
@@ -60,12 +60,12 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
           <span className="flex items-center gap-2">
             <svg
               className="w-4 h-4 text-white"
-              fill="none"                
-              viewBox="0 0 24 24"    
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1.5}
-              strokeLinecap="round"      
-              strokeLinejoin="round" 
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" />
               <path d="M12 10v6" />
@@ -75,9 +75,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
           </span>
         </button>
         <div className="flex flex-col border-b border-neutral-200 pb-4 gap-4 w-full">
-          <h3 className="text-lg font-bold text-brand-900">
-            Assets detail
-          </h3>
+          <h3 className="text-lg font-bold text-brand-900">Assets detail</h3>
           <h4 className="text-sm font-normal text-neutral-700">
             {filteredData.length} assets in current selection
           </h4>
@@ -205,10 +203,11 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                       </div>
                       <div>
                         <span
-                          className={`inline-flex items-center ${performance.isPositive
-                            ? "text-green-600"
-                            : "text-red-600"
-                            }`}
+                          className={`inline-flex items-center ${
+                            performance.isPositive
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
                         >
                           {performance.isPositive ? (
                             <svg
