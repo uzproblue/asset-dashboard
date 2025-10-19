@@ -109,35 +109,35 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
         </div>
       </div>
       {/* Table Body */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <div className="w-full mx-[-8px] ">
+        <table className="min-w-full ">
+          <thead className="bg-table-row/80">
+            <tr className="grid grid-cols-9 gap-4 px-5 py-2  text-neutral-700 text-left tracking-normal border-b border-neutral-200 items-center font-inter">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Asset
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Category
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Subcategory
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Expert
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Release date
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Issue value
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Current value
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="pl-3 text-xs font-medium min-h-5">
                 Performance
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="">
                 {/* Star column */}
               </th>
             </tr>
@@ -175,21 +175,21 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
                 >
-                  <div className="hover:bg-gray-50 border-b border-gray-200">
-                    <div className="px-6 py-4 grid grid-cols-9 gap-4 text-sm">
-                      <div className="font-medium text-gray-900 truncate">
+                  <div className="hover:bg-gray-50 border-b border-neutral-200">
+                    <div className="bg-white/70 pr-3 pl-7 py-2 grid grid-cols-9 gap-8 min-h-12.5 items-center">
+                      <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.asset_en}
                       </div>
-                      <div className="text-gray-500 truncate">
+                      <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.category_en}
                       </div>
-                      <div className="text-gray-500 truncate">
+                      <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.subcategory_en}
                       </div>
-                      <div className="text-gray-500 truncate">
+                      <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.expert}
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-sm font-normal text-neutral-900 truncate">
                         {new Date(
                           item.release_date_formatted
                         ).toLocaleDateString("en-US", {
@@ -197,22 +197,22 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                           year: "numeric",
                         })}
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-sm font-normal text-neutral-900 truncate text-right">
                         €{item.issuance_value_eur.toFixed(2)}
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-sm font-normal text-neutral-900 truncate text-right">
                         €{item.value_eur.toFixed(2)}
                       </div>
                       <div>
                         <span
-                          className={`inline-flex items-center ${performance.isPositive
-                            ? "text-green-600"
-                            : "text-red-600"
+                          className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${performance.isPositive
+                            ? "text-green-600 border-green-200 bg-green-50"
+                            : "text-red-600 border-red-200 bg-red-50"
                             }`}
                         >
                           {performance.isPositive ? (
                             <svg
-                              className="w-4 h-4 mr-1"
+                              className="w-3.5 h-3.5"
                               fill="currentColor"
                               viewBox="0 0 20 20"
                             >
