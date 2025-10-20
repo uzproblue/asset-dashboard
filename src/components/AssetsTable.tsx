@@ -32,13 +32,13 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
       );
   }, [data, selectedAssets, searchTerm]);
 
-  // Virtual scrolling setup
+  // Virtual scrolling setup - optimized for performance
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: filteredData.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 50, // Row height
-    overscan: 10, // Render extra items for smooth scrolling
+    estimateSize: () => 45, // Reduced row height for better performance
+    overscan: 3, // Reduced overscan for better memory usage
   });
 
   // Calculate performance percentage
@@ -77,9 +77,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
           </span>
         </button>
         <div className="flex flex-col border-b border-neutral-200 pb-4 gap-4 w-full">
-          <h3 className="text-lg font-bold text-brand-900">
-            Assets detail
-          </h3>
+          <h3 className="text-lg font-bold text-brand-900">Assets detail</h3>
           <h4 className="text-sm font-normal text-neutral-700">
             {filteredData.length} assets in current selection
           </h4>

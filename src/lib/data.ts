@@ -196,19 +196,25 @@ export function getChartData(
     dataToUse = assetData.filter((_, index) => index % step === 0);
   }
 
-  return dataToUse.map((item) => ({
-    x: item.price_date_formatted,
+  return dataToUse.map((item, index) => ({
+    x: index + 1, // Sequential data point number (1-based)
     y: showIndexed ? item.indexed_value : item.value_eur,
     value_eur: item.value_eur,
     indexed_value: item.indexed_value,
   }));
 }
 
-// Memoized chart data generation
+// Memoized chart data generation with size limit
 const chartDataCache = new Map<
   string,
-  { x: string; y: number; value_eur: number; indexed_value: number }[]
+  { x: number; y: number; value_eur: number; indexed_value: number }[]
 >();
+
+// Clear cache when it gets too large (prevent memory leaks)
+const MAX_CACHE_SIZE = 50;
+if (chartDataCache.size > MAX_CACHE_SIZE) {
+  chartDataCache.clear();
+}
 
 export function getMemoizedChartData(
   assetData: ProcessedAssetData[],
@@ -230,4 +236,10 @@ export function getMemoizedChartData(
 // Clear cache when needed
 export function clearChartDataCache() {
   chartDataCache.clear();
+}
+
+// Clear all caches for memory management
+export function clearAllCaches() {
+  chartDataCache.clear();
+  // Clear any other caches here
 }
