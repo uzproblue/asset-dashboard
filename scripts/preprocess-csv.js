@@ -1,18 +1,24 @@
 const fs = require("fs");
 const path = require("path");
 
-// Convert Excel date number to JavaScript Date
-function excelDateToJSDate(excelDate) {
-  const excelEpoch = new Date(1900, 0, 1);
-  const jsDate = new Date(
-    excelEpoch.getTime() + (excelDate - 2) * 24 * 60 * 60 * 1000
-  );
-  return jsDate;
-}
-
 // Format date for display
 function formatDate(date) {
   return date.toLocaleDateString("en-CA"); // YYYY-MM-DD format
+}
+
+// Parse date strings in MM/DD/YY or MM/DD/YYYY format
+function parseDateString(dateStr) {
+  if (!dateStr || typeof dateStr !== "string") return null;
+
+  const match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (match) {
+    let [, month, day, year] = match;
+    year = parseInt(year);
+    year = year.toString().length === 2 ? 2000 + year : year;
+    return new Date(year, parseInt(month) - 1, parseInt(day));
+  }
+
+  return null;
 }
 
 // Parse CSV line handling quotes properly
@@ -56,12 +62,10 @@ function parseCSV(csvContent) {
     headers.forEach((header, index) => {
       const value = values[index];
 
-      // Convert numeric fields
+      // Convert numeric fields ONLY (not dates)
       if (
         [
-          "price_date",
           "value_eur",
-          "release_date",
           "issuance_value_eur",
           "number_of_splints",
           "Round indexed_at 100",
@@ -81,12 +85,17 @@ function parseCSV(csvContent) {
 
 // Process asset data with pre-calculated values
 function processAssetData(rawData) {
-  return rawData.map((item) => ({
-    ...item,
-    price_date_formatted: formatDate(excelDateToJSDate(item.price_date)),
-    release_date_formatted: formatDate(excelDateToJSDate(item.release_date)),
-    indexed_value: item["Round indexed_at 100"],
-  }));
+  return rawData.map((item) => {
+    const priceDate = parseDateString(item.price_date);
+    const releaseDate = parseDateString(item.release_date);
+
+    return {
+      ...item,
+      price_date_formatted: priceDate ? formatDate(priceDate) : null,
+      release_date_formatted: releaseDate ? formatDate(releaseDate) : null,
+      indexed_value: item["Round indexed_at 100"],
+    };
+  });
 }
 
 // Create efficient indexes for filtering
@@ -122,13 +131,30 @@ function groupDataByAsset(data) {
     grouped[item.asset_en].push(item);
   });
 
-  // Sort each group by date
+  // Sort each group by date and add sequence numbers
   Object.keys(grouped).forEach((asset) => {
+    // Sort by date (ascending)
     grouped[asset].sort(
       (a, b) =>
         new Date(a.price_date_formatted).getTime() -
         new Date(b.price_date_formatted).getTime()
     );
+
+    // Add sequence numbers and recalculate indexed values from first point
+    const assetData = grouped[asset];
+    if (assetData.length > 0) {
+      // Get the first (issuance) value for indexing
+      const firstValue = assetData[0].value_eur;
+
+      assetData.forEach((item, index) => {
+        // Add sequence number (1-based)
+        item.sequence = index + 1;
+
+        // Recalculate indexed value from first point (issuance)
+        item.indexed_value =
+          firstValue > 0 ? (item.value_eur / firstValue) * 100 : 100;
+      });
+    }
   });
 
   return grouped;
@@ -140,12 +166,14 @@ function preprocessCSV() {
     console.log("Starting CSV preprocessing...");
 
     const csvPath = path.join(process.cwd(), "public", "data", "assets.csv");
-    const outputPath = path.join(
-      process.cwd(),
-      "public",
-      "data",
-      "assets.json"
-    );
+    const outputDir = path.join(process.cwd(), "public", "data");
+    const outputPath = path.join(outputDir, "assets.json");
+    const chunksDir = path.join(outputDir, "chunks");
+
+    // Create chunks directory if it doesn't exist
+    if (!fs.existsSync(chunksDir)) {
+      fs.mkdirSync(chunksDir, { recursive: true });
+    }
 
     // Read CSV file
     const csvContent = fs.readFileSync(csvPath, "utf-8");
@@ -167,7 +195,43 @@ function preprocessCSV() {
     const groupedData = groupDataByAsset(processedData);
     console.log(`Grouped data for ${Object.keys(groupedData).length} assets`);
 
-    // Create optimized output
+    // Create chunks for large datasets (10k rows per chunk)
+    const CHUNK_SIZE = 10000;
+    const totalChunks = Math.ceil(processedData.length / CHUNK_SIZE);
+    console.log(`Creating ${totalChunks} chunks of ${CHUNK_SIZE} rows each`);
+
+    // Write chunk files
+    for (let i = 0; i < totalChunks; i++) {
+      const start = i * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, processedData.length);
+      const chunkData = processedData.slice(start, end);
+
+      const chunkPath = path.join(chunksDir, `assets-chunk-${i + 1}.json`);
+      fs.writeFileSync(chunkPath, JSON.stringify(chunkData, null, 2));
+      console.log(
+        `Created chunk ${i + 1}/${totalChunks}: ${chunkData.length} rows`
+      );
+    }
+
+    // Create metadata file (indexes only)
+    const metadata = {
+      indexes,
+      groupedData,
+      metadata: {
+        totalRows: processedData.length,
+        totalAssets: Object.keys(groupedData).length,
+        totalChunks,
+        chunkSize: CHUNK_SIZE,
+        lastUpdated: new Date().toISOString(),
+        version: "2.0",
+      },
+    };
+
+    const metadataPath = path.join(outputDir, "assets-metadata.json");
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    console.log(`Created metadata file: ${metadataPath}`);
+
+    // Create optimized output (for backward compatibility)
     const optimizedData = {
       data: processedData,
       indexes,
@@ -176,12 +240,12 @@ function preprocessCSV() {
         totalRows: processedData.length,
         totalAssets: Object.keys(groupedData).length,
         lastUpdated: new Date().toISOString(),
-        version: "1.0",
+        version: "2.0",
       },
     };
 
-    // Write JSON file
-    fs.writeFileSync(outputPath, JSON.stringify(optimizedData, null, 2));
+    // Write JSON file (compressed)
+    fs.writeFileSync(outputPath, JSON.stringify(optimizedData));
 
     const originalSize = fs.statSync(csvPath).size;
     const newSize = fs.statSync(outputPath).size;

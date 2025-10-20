@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { readFileSync, statSync } from "fs";
 import { join } from "path";
+import { gzip } from "zlib";
+import { promisify } from "util";
+
+const gzipAsync = promisify(gzip);
 
 // Cache for the processed data
 interface OptimizedData {
@@ -33,9 +37,13 @@ export async function GET() {
 
     // Use cached data if file hasn't changed
     if (cachedData && currentModified === lastModified) {
-      return new NextResponse(JSON.stringify(cachedData), {
+      const jsonString = JSON.stringify(cachedData);
+      const compressed = await gzipAsync(jsonString);
+
+      return new NextResponse(compressed, {
         headers: {
           "Content-Type": "application/json",
+          "Content-Encoding": "gzip",
           "Cache-Control": "public, max-age=3600, s-maxage=3600", // Cache for 1 hour
           ETag: `"${currentModified}"`,
           "Last-Modified": stats.mtime.toUTCString(),
@@ -51,9 +59,13 @@ export async function GET() {
     cachedData = data;
     lastModified = currentModified;
 
-    return new NextResponse(JSON.stringify(data), {
+    const jsonString = JSON.stringify(data);
+    const compressed = await gzipAsync(jsonString);
+
+    return new NextResponse(compressed, {
       headers: {
         "Content-Type": "application/json",
+        "Content-Encoding": "gzip",
         "Cache-Control": "public, max-age=3600, s-maxage=3600", // Cache for 1 hour
         ETag: `"${currentModified}"`,
         "Last-Modified": stats.mtime.toUTCString(),
