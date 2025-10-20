@@ -180,7 +180,7 @@ function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 ">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-96">
@@ -195,7 +195,7 @@ function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-sm:w-343/375 sm:w-638/744 lg:w-15/16 min-xl:w-300">
+    <main className="mx-auto max-sm:w-343/375 sm:w-638/744 lg:w-15/16 min-xl:w-300 pt-4 pb-12">
       <Header />
 
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
@@ -318,9 +318,11 @@ function HomePage() {
           <AssetsTable data={filteredData} selectedAssets={selectedAssets} />
         </div>
 
+        <span className="w-full bg-line h-0.5 my-2" ></span>
+
         {/* Footer Disclaimer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="rounded-4xl p-4 border-8 bg-white/70 border-neutral-200/50 shadow-filter gap-2.5 ">
+          <p className="text-sm font-normal text-neutral-700 text-center">
             Values are estimates: past performance is not indicative of future
             results.
           </p>
