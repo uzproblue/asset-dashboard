@@ -59,6 +59,33 @@ export const translations = {
     clearAll: "Clear All",
     loading: "Loading...",
     noData: "No data available",
+    // New translations
+    performanceChart: "Performance Chart",
+    assetsDetail: "Assets detail",
+    downloadCSV: "Download CSV",
+    searchAsset: "Search asset",
+    noAssetsFound: "No assets found matching your criteria.",
+    selectRange: "Select range",
+    selectItem: "Select item",
+    selectSubcategory: "Select subcategory",
+    selectAsset: "Select asset",
+    pageTitle: "Alternative Assets — Value per Splint (Monthly)",
+    pageSubtitle:
+      "Explore performance by asset, expert, category or your own selection.",
+    releaseDate: "Release date",
+    issueValue: "Issue value",
+    currentValue: "Current value",
+    performance: "Performance",
+    assetsInSelection: "assets in current selection",
+    dataThrough: "Data through 2024-10",
+    indexedValue: "Indexed value",
+    assetValue: "Asset value",
+    indexTo100: "Index to 100 at release",
+    startDate: "Start date",
+    endDate: "End date",
+    clearDates: "Clear dates",
+    applyDates: "Apply",
+    selectDateRange: "Select date range",
   },
   de: {
     title: "Asset-Wert Dashboard",
@@ -75,6 +102,33 @@ export const translations = {
     clearAll: "Alle löschen",
     loading: "Laden...",
     noData: "Keine Daten verfügbar",
+    // New translations
+    performanceChart: "Leistungsdiagramm",
+    assetsDetail: "Asset-Details",
+    downloadCSV: "CSV herunterladen",
+    searchAsset: "Asset suchen",
+    noAssetsFound: "Keine Assets gefunden, die Ihren Kriterien entsprechen.",
+    selectRange: "Bereich auswählen",
+    selectItem: "Element auswählen",
+    selectSubcategory: "Unterkategorie auswählen",
+    selectAsset: "Asset auswählen",
+    pageTitle: "Alternative Assets — Wert pro Splint (Monatlich)",
+    pageSubtitle:
+      "Erkunden Sie die Performance nach Asset, Experte, Kategorie oder Ihrer eigenen Auswahl.",
+    releaseDate: "Veröffentlichungsdatum",
+    issueValue: "Ausgabewert",
+    currentValue: "Aktueller Wert",
+    performance: "Performance",
+    assetsInSelection: "Assets in aktueller Auswahl",
+    dataThrough: "Daten bis 2024-10",
+    indexedValue: "Indexierter Wert",
+    assetValue: "Asset-Wert",
+    indexTo100: "Index auf 100 bei Veröffentlichung",
+    startDate: "Startdatum",
+    endDate: "Enddatum",
+    clearDates: "Daten löschen",
+    applyDates: "Anwenden",
+    selectDateRange: "Datumsbereich auswählen",
   },
   fr: {
     title: "Tableau de Bord des Valeurs d'Actifs",
@@ -91,6 +145,33 @@ export const translations = {
     clearAll: "Tout effacer",
     loading: "Chargement...",
     noData: "Aucune donnée disponible",
+    // New translations
+    performanceChart: "Graphique de Performance",
+    assetsDetail: "Détails des Actifs",
+    downloadCSV: "Télécharger CSV",
+    searchAsset: "Rechercher un actif",
+    noAssetsFound: "Aucun actif trouvé correspondant à vos critères.",
+    selectRange: "Sélectionner la plage",
+    selectItem: "Sélectionner un élément",
+    selectSubcategory: "Sélectionner une sous-catégorie",
+    selectAsset: "Sélectionner un actif",
+    pageTitle: "Actifs Alternatifs — Valeur par Splint (Mensuel)",
+    pageSubtitle:
+      "Explorez la performance par actif, expert, catégorie ou votre propre sélection.",
+    releaseDate: "Date de sortie",
+    issueValue: "Valeur d'émission",
+    currentValue: "Valeur actuelle",
+    performance: "Performance",
+    assetsInSelection: "actifs dans la sélection actuelle",
+    dataThrough: "Données jusqu'en 2024-10",
+    indexedValue: "Valeur indexée",
+    assetValue: "Valeur de l'actif",
+    indexTo100: "Index à 100 à la sortie",
+    startDate: "Date de début",
+    endDate: "Date de fin",
+    clearDates: "Effacer les dates",
+    applyDates: "Appliquer",
+    selectDateRange: "Sélectionner la plage de dates",
   },
 };
 
@@ -242,4 +323,91 @@ export function clearChartDataCache() {
 export function clearAllCaches() {
   chartDataCache.clear();
   // Clear any other caches here
+}
+
+// Get filtered options for cascading filters
+export function getFilteredOptions(
+  data: ProcessedAssetData[],
+  currentFilters: {
+    categories: string[];
+    subcategories: string[];
+    experts: string[];
+    assets: string[];
+  }
+): {
+  categories: string[];
+  subcategories: string[];
+  experts: string[];
+  assets: string[];
+} {
+  // Start with all data
+  let filteredData = data;
+
+  // Apply category filter first (if any selected)
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    filteredData = filteredData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+
+  // Apply expert filter (if any selected)
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    filteredData = filteredData.filter((item) => expertSet.has(item.expert));
+  }
+
+  // Apply subcategory filter (if any selected)
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    filteredData = filteredData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+
+  // Now compute available options based on current filtered data
+  const availableCategories = getUniqueValues(data, "category_en");
+
+  // For subcategories: show only those that exist for selected categories + experts
+  let subcategoryData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    subcategoryData = subcategoryData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    subcategoryData = subcategoryData.filter((item) =>
+      expertSet.has(item.expert)
+    );
+  }
+  const availableSubcategories = getUniqueValues(
+    subcategoryData,
+    "subcategory_en"
+  );
+
+  // For experts: show only those that exist for selected categories + subcategories
+  let expertData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    expertData = expertData.filter((item) => categorySet.has(item.category_en));
+  }
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    expertData = expertData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+  const availableExperts = getUniqueValues(expertData, "expert");
+
+  // For assets: show only those that exist for all selected filters
+  const availableAssets = getUniqueValues(filteredData, "asset_en");
+
+  return {
+    categories: availableCategories,
+    subcategories: availableSubcategories,
+    experts: availableExperts,
+    assets: availableAssets,
+  };
 }

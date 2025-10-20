@@ -2,18 +2,96 @@
 
 import { useState, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ProcessedAssetData } from "@/lib/data";
+import { ProcessedAssetData, Language, translations } from "@/lib/data";
 
 interface AssetsTableProps {
   data: ProcessedAssetData[];
   selectedAssets: string[];
+  language: Language;
 }
 
-export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
+export function AssetsTable({
+  data,
+  selectedAssets,
+  language,
+}: AssetsTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const parentRef = useRef<HTMLDivElement>(null);
+  const t = translations[language];
 
-  // Filter data based on selected assets and search term (memoized for performance)
+  // Calculate performance percentage
+  const calculatePerformance = (item: ProcessedAssetData) => {
+    const performance =
+      ((item.value_eur - item.issuance_value_eur) / item.issuance_value_eur) *
+      100;
+    return {
+      percentage: performance,
+      isPositive: performance >= 0,
+    };
+  };
+
+  // CSV download function
+  const downloadCSV = () => {
+    if (filteredData.length === 0) {
+      return; // Don't download if no data
+    }
+
+    // Define CSV headers (translated)
+    const headers = [
+      t.asset,
+      t.category,
+      t.subcategory,
+      t.expert,
+      t.releaseDate,
+      t.issueValue,
+      t.currentValue,
+      t.performance,
+    ];
+
+    // Convert data to CSV rows
+    const rows = filteredData.map((item) => {
+      const perf = calculatePerformance(item);
+      return [
+        item.asset_en,
+        item.category_en,
+        item.subcategory_en,
+        item.expert,
+        item.release_date_formatted,
+        item.issuance_value_eur.toFixed(2),
+        item.value_eur.toFixed(2),
+        `${perf.percentage.toFixed(2)}%`,
+      ];
+    });
+
+    // Combine headers and rows with proper CSV escaping
+    const csvContent = [
+      headers.map((header) => `"${header.replace(/"/g, '""')}"`).join(","),
+      ...rows.map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `assets-export-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+
+  // Filter and sort data based on selected assets and search term (memoized for performance)
   const filteredData = useMemo(() => {
     return data
       .filter(
@@ -29,7 +107,13 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           item.expert.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      )
+      .sort((a, b) => {
+        // Sort by performance (descending) - best performers first
+        const perfA = calculatePerformance(a).percentage;
+        const perfB = calculatePerformance(b).percentage;
+        return perfB - perfA;
+      });
   }, [data, selectedAssets, searchTerm]);
 
   // Virtual scrolling setup - optimized for performance
@@ -58,7 +142,11 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
     <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2">
       {/* Table Header*/}
       <div className="flex flex-col items-start py-5 px-6 gap-4 justify-between">
-        <button className="max-sm:w-90/100 max-sm:order-last sm:absolute top-5 right-6 rounded-xl py-2 px-3 gap-2 bg-brand-500 hover:bg-brand-900 text-sm font-medium text-white">
+        <button
+          onClick={downloadCSV}
+          disabled={filteredData.length === 0}
+          className="max-sm:w-90/100 max-sm:order-last sm:absolute top-5 right-6 rounded-xl py-2 px-3 gap-2 bg-brand-500 hover:bg-brand-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
+        >
           <span className="flex items-center gap-2">
             <svg
               className="w-4 h-4 text-white"
@@ -73,13 +161,13 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
               <path d="M12 10v6" />
               <path d="M9.5 13.5L12 16l2.5-2.5" />
             </svg>
-            Download CSV
+            {t.downloadCSV}
           </span>
         </button>
         <div className="flex flex-col border-b border-neutral-200 pb-4 gap-4 w-full">
-          <h3 className="text-lg font-bold text-brand-900">Assets detail</h3>
+          <h3 className="text-lg font-bold text-brand-900">{t.assetsDetail}</h3>
           <h4 className="text-sm font-normal text-neutral-700">
-            {filteredData.length} assets in current selection
+            {filteredData.length} {t.assetsInSelection}
           </h4>
         </div>
 
@@ -101,7 +189,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
           </div>
           <input
             type="text"
-            placeholder="Search asset"
+            placeholder={t.searchAsset}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 px-3 py-2 w-full  border bg-neutral-50 border-neutral-200 rounded-xl text-sm font-normal text-neutral-700 placeholder-neutral-700 focus:ring-2 focus:ring-brand-100 focus:border-brand-100  hover:border-brand-100 hover:border-2 focus:outline-none"
