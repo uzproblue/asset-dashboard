@@ -241,7 +241,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
         {/* Virtual scrolling container */}
         <div
           ref={parentRef}
-          className="h-96 overflow-y-auto pt-4"
+          className="h-96 overflow-y-auto max-xl:pt-4"
           style={{
             contain: "strict",
           }}
