@@ -52,6 +52,8 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
     };
   };
 
+  
+
   return (
     <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2">
       {/* Table Header*/}
@@ -60,12 +62,12 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
           <span className="flex items-center gap-2">
             <svg
               className="w-4 h-4 text-white"
-              fill="none"                
-              viewBox="0 0 24 24"    
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1.5}
-              strokeLinecap="round"      
-              strokeLinejoin="round" 
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" />
               <path d="M12 10v6" />
@@ -109,35 +111,126 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
         </div>
       </div>
       {/* Table Body */}
-      <div className="w-full mx-[-8px] ">
+      <div className="w-full xl:mx-[-8px] ">
         <table className="min-w-full ">
-          <thead className="bg-table-row/80">
-            <tr className="grid grid-cols-9 gap-4 px-5 py-2  text-neutral-700 text-left tracking-normal border-b border-neutral-200 items-center font-inter">
-              <th className="pl-3 text-xs font-medium min-h-5">
+          <thead>
+            <tr className="xl:grid xl:grid-cols-9  max-xl:py-4 max-xl:px-4 xl:gap-4 xl:px-5 xl:py-2  text-neutral-700 text-left tracking-normal border-b border-t border-neutral-200 items-center flex justify-left xl:bg-table-row/80 max-xl:gap-2.5 ">
+              <th className="pl-3 min-w-40 text-xs font-medium min-h-5 max-xl:hidden">
                 Asset
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
+              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
                 Category
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
+              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
                 Subcategory
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
+              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
                 Expert
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
-                Release date
+              <th className="max-xl:rounded-lg max-xl:py-2 text-center max-xl:px-3 xl:pr-3 text-xs font-medium min-h-5 min-w-30.5 max-xl:bg-table-row/80 max-xl:h-9 max-xl:order-4">
+                <span className="flex gap-2 items-center xl:justify-left max-xl:justify-center">
+                  Release date
+                  <svg
+                    width="11.33"
+                    height="8"
+                    viewBox="0 0 11.33 8"
+                    fill="none"
+                    stroke="#7E7F7A"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+
+                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                   
+                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                    
+                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+
+                    <polyline points="8 5.3 9.5 7 11 5.3" />
+                  </svg>
+                  
+                </span>
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
-                Issue value
+              <th className="max-xl:rounded-lg max-xl:px-3 max-xl:py-2 xl:pl-4 text-xs font-medium min-h-5 min-w-28.5 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-3">
+                <span className="flex gap-2 pl-2 items-center justify-left max-xl:justify-center ">
+                  Issue value
+                  <svg
+                    width="11.33"
+                    height="8"
+                    viewBox="0 0 11.33 8"
+                    fill="none"
+                    stroke="#7E7F7A"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+
+                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                   
+                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                    
+                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+
+                    <polyline points="8 5.3 9.5 7 11 5.3" />
+                  </svg>
+                </span>
+                
+
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
-                Current value
+              <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-31.5 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-2">
+                <span className="flex gap-2 items-center justify-left max-xl:justify-center">
+                  Current value
+                  <svg
+                    width="11.33"
+                    height="8"
+                    viewBox="0 0 11.33 8"
+                    fill="none"
+                    stroke="#7E7F7A"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+
+                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                   
+                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                    
+                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+
+                    <polyline points="8 5.3 9.5 7 11 5.3" />
+                  </svg>
+                </span> 
               </th>
-              <th className="pl-3 text-xs font-medium min-h-5">
-                Performance
+              <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-30.75 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-1">
+                <span className="flex gap-2 items-center max-xl:justify-center">
+                  Performance
+                  <svg
+                    width="11.33"
+                    height="8"
+                    viewBox="0 0 11.33 8"
+                    fill="none"
+                    stroke="#7E7F7A"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+
+                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                   
+                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                    
+                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+
+                    <polyline points="8 5.3 9.5 7 11 5.3" />
+                  </svg>
+                </span>                
               </th>
-              <th className="">
+              <th className="max-w-15">
                 {/* Star column */}
               </th>
             </tr>
@@ -164,7 +257,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
               const performance = calculatePerformance(item);
 
               return (
-                <div
+                <div className="max-xl:py-5 max-xl:px-6 max-xl:bg-white/70 flex flex-col" 
                   key={virtualItem.key}
                   style={{
                     position: "absolute",
@@ -175,8 +268,8 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
                 >
-                  <div className="hover:bg-gray-50 border-b border-neutral-200">
-                    <div className="bg-white/70 pr-3 pl-7 py-2 grid grid-cols-9 gap-8 min-h-12.5 items-center">
+                  <div className="xl:hover:bg-gray-50 border-b border-neutral-200 ">
+                    <div className="bg-white/70 pr-3 pl-7 py-2 grid grid-cols-9 gap-8 min-h-12.5 items-center max-xl:rounded-lg max-xl:border max-xl:bg-whit e/70 shadow-filter border-neutral-200">
                       <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.asset_en}
                       </div>
@@ -203,7 +296,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                       <div className="text-sm font-normal text-neutral-900 truncate text-right">
                         €{item.value_eur.toFixed(2)}
                       </div>
-                      <div>
+                      <div className="text-right">
                         <span
                           className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${performance.isPositive
                             ? "text-green-600 border-green-200 bg-green-50"
@@ -238,13 +331,12 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                           {Math.abs(performance.percentage).toFixed(1)}%
                         </span>
                       </div>
-                      <div>
-                        <button className="text-gray-400 hover:text-blue-600">
+                      <div className="py-2 pr-6 pl-3">
+                        <button className="text-neutral-700 transition-transform duration-200 hover:-translate-y-0.5 group hover:bg-brand-100/50 p-0.5 rounded-sm">
                           <svg
                             className="w-4 h-4"
                             fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
+                            viewBox="0 0 20 20"                          >
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                         </button>
