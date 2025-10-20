@@ -425,9 +425,11 @@ function HomePage() {
           />
         </div>
 
+        <span className="w-full bg-line h-0.5 my-2" ></span>
+
         {/* Footer Disclaimer */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="rounded-4xl p-4 border-8 bg-white/70 border-neutral-200/50 shadow-filter gap-2.5 ">
+          <p className="text-sm font-normal text-neutral-700 text-center">
             Values are estimates: past performance is not indicative of future
             results.
           </p>
