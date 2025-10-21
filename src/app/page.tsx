@@ -23,6 +23,7 @@ import {
   getUniqueValues,
   filterData,
   groupDataByAsset,
+  getFilteredOptions,
 } from "@/lib/data";
 import { parseCSV, parseJSON } from "@/lib/csv-parser";
 import { debounce } from "@/lib/performance";
@@ -66,12 +67,15 @@ function HomePage() {
           if (firstChunkResponse.ok) {
             const chunkText = await firstChunkResponse.text();
             const firstChunk = parseJSON(chunkText);
-            setProcessedData(firstChunk);
+            setProcessedData(firstChunk as unknown as ProcessedAssetData[]);
 
             // Load remaining chunks in background
-            const totalChunks = metadata.metadata.totalChunks || 1;
+            const totalChunks = (metadata.metadata as any).totalChunks || 1;
             if (totalChunks > 1) {
-              loadRemainingChunks(totalChunks, firstChunk);
+              loadRemainingChunks(
+                totalChunks,
+                firstChunk as unknown as ProcessedAssetData[]
+              );
             }
           }
         } else {
@@ -119,7 +123,7 @@ function HomePage() {
           if (chunkResponse.ok) {
             const chunkText = await chunkResponse.text();
             const chunk = parseJSON(chunkText);
-            allData.push(...chunk);
+            allData.push(...(chunk as unknown as ProcessedAssetData[]));
 
             // Update data progressively
             setProcessedData([...allData]);
@@ -136,31 +140,62 @@ function HomePage() {
     loadData();
   }, []);
 
-  // Get unique values for filters (use optimized indexes if available)
-  const categories = useMemo(
-    () =>
-      optimizedData?.indexes.categories ||
-      getUniqueValues(processedData, "category_en"),
-    [optimizedData, processedData]
-  );
-  const subcategories = useMemo(
-    () =>
-      optimizedData?.indexes.subcategories ||
-      getUniqueValues(processedData, "subcategory_en"),
-    [optimizedData, processedData]
-  );
-  const experts = useMemo(
-    () =>
-      optimizedData?.indexes.experts ||
-      getUniqueValues(processedData, "expert"),
-    [optimizedData, processedData]
-  );
-  const assets = useMemo(
-    () =>
-      optimizedData?.indexes.assets ||
-      getUniqueValues(processedData, "asset_en"),
-    [optimizedData, processedData]
-  );
+  // Get dynamic filter options based on current selections
+  const filterOptions = useMemo(() => {
+    const currentFilters = {
+      categories: selectedCategories,
+      subcategories: selectedSubcategories,
+      experts: selectedExperts,
+      assets: selectedAssets,
+    };
+
+    const baseData = optimizedData?.data || processedData;
+
+    return getFilteredOptions(baseData, currentFilters);
+  }, [
+    optimizedData,
+    processedData,
+    selectedCategories,
+    selectedSubcategories,
+    selectedExperts,
+    selectedAssets,
+  ]);
+
+  const { categories, subcategories, experts, assets } = filterOptions;
+
+  // Auto-clear invalid selections when dependencies change
+  useEffect(() => {
+    if (selectedSubcategories.length > 0) {
+      const validSubcategories = selectedSubcategories.filter(
+        (subcategory: string) => subcategories.includes(subcategory)
+      );
+      if (validSubcategories.length !== selectedSubcategories.length) {
+        setSelectedSubcategories(validSubcategories);
+      }
+    }
+  }, [subcategories, selectedSubcategories]);
+
+  useEffect(() => {
+    if (selectedExperts.length > 0) {
+      const validExperts = selectedExperts.filter((expert: string) =>
+        experts.includes(expert)
+      );
+      if (validExperts.length !== selectedExperts.length) {
+        setSelectedExperts(validExperts);
+      }
+    }
+  }, [experts, selectedExperts]);
+
+  useEffect(() => {
+    if (selectedAssets.length > 0) {
+      const validAssets = selectedAssets.filter((asset: string) =>
+        assets.includes(asset)
+      );
+      if (validAssets.length !== selectedAssets.length) {
+        setSelectedAssets(validAssets);
+      }
+    }
+  }, [assets, selectedAssets]);
 
   // Filter data based on selections
   const filteredData = useMemo(() => {
@@ -200,28 +235,32 @@ function HomePage() {
 
   // Debounced filter handlers with transitions for better performance
   const debouncedSetCategories = useCallback(
-    debounce((categories: string[]) => {
+    debounce((...args: unknown[]) => {
+      const categories = args[0] as string[];
       startTransition(() => setSelectedCategories(categories));
     }, 300),
     [startTransition]
   );
 
   const debouncedSetSubcategories = useCallback(
-    debounce((subcategories: string[]) => {
+    debounce((...args: unknown[]) => {
+      const subcategories = args[0] as string[];
       startTransition(() => setSelectedSubcategories(subcategories));
     }, 300),
     [startTransition]
   );
 
   const debouncedSetExperts = useCallback(
-    debounce((experts: string[]) => {
+    debounce((...args: unknown[]) => {
+      const experts = args[0] as string[];
       startTransition(() => setSelectedExperts(experts));
     }, 300),
     [startTransition]
   );
 
   const debouncedSetAssets = useCallback(
-    debounce((assets: string[]) => {
+    debounce((...args: unknown[]) => {
+      const assets = args[0] as string[];
       startTransition(() => setSelectedAssets(assets));
     }, 300),
     [startTransition]
@@ -229,8 +268,8 @@ function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 ">
-        <Header />
+      <main className="min-h-screen bg-gray-50">
+        <Header language={language} onLanguageChange={setLanguage} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -244,18 +283,17 @@ function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-sm:w-343/375 sm:w-638/744 lg:w-15/16 min-xl:w-300 pt-4 pb-12">
-      <Header />
+    <main className="mx-auto max-sm:w-343/375 sm:w-638/744 lg:w-15/16 min-xl:w-300">
+      <Header language={language} onLanguageChange={setLanguage} />
 
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
         {/* Page Title and Subtitle */}
         <div className="flex flex-col gap-1">
           <h1 className="font-bold text-2xl w-full leadeing-[1.5] tracking-[-0.01em] text-brand-900 m-0">
-            Alternative Assets — Value per Splint (Monthly)
+            {t.pageTitle}
           </h1>
           <h2 className="m-0 text-lg font-normal leadeing-[1.5] text-neutral-700">
-            Explore performance by asset, expert, category or your own
-            selection.
+            {t.pageSubtitle}
           </h2>
         </div>
 
@@ -271,40 +309,42 @@ function HomePage() {
                     options={categories}
                     selectedValues={selectedCategories}
                     onSelectionChange={debouncedSetCategories}
-                    label="Category"
+                    label={t.category}
                     language={language}
-                    placeholder="Select item"
+                    placeholder={t.selectItem}
                   />
 
                   <FilterSelect
                     options={subcategories}
                     selectedValues={selectedSubcategories}
                     onSelectionChange={debouncedSetSubcategories}
-                    label="Subcategory"
+                    label={t.subcategory}
                     language={language}
-                    placeholder="Select subcategory"
+                    placeholder={t.selectSubcategory}
                   />
 
                   <FilterSelect
                     options={experts}
                     selectedValues={selectedExperts}
                     onSelectionChange={debouncedSetExperts}
-                    label="Expert"
+                    label={t.expert}
                     language={language}
-                    placeholder="Select subcategory"
+                    placeholder={t.selectSubcategory}
                   />
 
                   <FilterSelect
                     options={availableAssets}
                     selectedValues={selectedAssets}
                     onSelectionChange={debouncedSetAssets}
-                    label="Asset"
+                    label={t.asset}
                     language={language}
-                    placeholder="Select asset"
+                    placeholder={t.selectAsset}
                   />
 
                   <div className="relative">
-                    <p className="text-sm font-medium text-neutral-900">Date range</p>
+                    <p className="text-sm font-medium text-neutral-900">
+                      Date range
+                    </p>
                     <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
                       <span className="flex items-center">
                         <svg
@@ -327,7 +367,9 @@ function HomePage() {
                 </>
               ) : (
                 <div className="relative">
-                  <p className="text-sm font-medium text-neutral-900">Date range</p>
+                  <p className="text-sm font-medium text-neutral-900">
+                    Date range
+                  </p>
                   <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-2 mt-2 focus:ring-1 focus:border-brand-100 focus:ring-inset focus:ring-brand-100 text-neutral-700">
                     <span className="flex items-center">
                       <svg
@@ -348,6 +390,30 @@ function HomePage() {
                   </button>
                 </div>
               )}
+
+              <div className="relative">
+                <p className="text-sm font-medium text-neutral-900">
+                  Date range
+                </p>
+                <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
+                  <span className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-2 text-neutral-700"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Select range
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -363,14 +429,16 @@ function HomePage() {
 
         {/* Assets Detail Table */}
         <div className="mt-8">
-          <AssetsTable data={filteredData} selectedAssets={selectedAssets} />
+          <AssetsTable
+            data={filteredData}
+            selectedAssets={selectedAssets}
+            language={language}
+          />
         </div>
 
-        <span className="w-full bg-line h-0.5 my-2" ></span>
-
         {/* Footer Disclaimer */}
-        <div className="rounded-4xl p-4 border-8 bg-white/70 border-neutral-200/50 shadow-filter gap-2.5 ">
-          <p className="text-sm font-normal text-neutral-700 text-center">
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
             Values are estimates: past performance is not indicative of future
             results.
           </p>

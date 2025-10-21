@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Language, translations } from "@/lib/data";
 
 interface FilterSelectProps {
@@ -22,7 +22,28 @@ export function FilterSelect({
 }: FilterSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const t = translations[language];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        event.target &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,31 +62,31 @@ export function FilterSelect({
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <div className="relative">
-        <p className="text-sm font-medium text-neutral-900">
-          {label}
-        </p>
+        <p className="text-sm font-medium text-neutral-900">{label}</p>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm hover:border-brand-100 focus:inline focus:ring-2 focus:ring-brand-100 focus:border-brand-100 text-neutral-700 mt-2 focus:ring-inset"
         >
-          <div className="flex items-center gap-4" >
-            <span className={selectedValues.length === 0
-              ? ``
-              : `border py-1 px-2 bg-neutral-100 border-neutral-200 rounded-4xl text-xs font-medium text-neutral-700`}>
+          <div className="flex items-center gap-4">
+            <span
+              className={
+                selectedValues.length === 0
+                  ? ``
+                  : `border py-1 px-2 bg-neutral-100 border-neutral-200 rounded-4xl text-xs font-medium text-neutral-700`
+              }
+            >
               {selectedValues.length === 0
                 ? placeholder || `Select ${label.toLowerCase()}...`
                 : `${selectedValues.length} item`}
             </span>
-
           </div>
           <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none h-4 top-9.5">
             <svg
               className={`w-4 h-4 text-neutral-700
-                transition-transform ${isOpen ? "rotate-180" : ""
-                }`}
+                transition-transform ${isOpen ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

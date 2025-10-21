@@ -100,10 +100,13 @@ export function ChartArea({
   });
 
   // Filter to only selected assets
+  const MAX_CHART_ASSETS = 30;
+  const allAvailableAssets = Object.keys(groupedData);
+
   const filteredAssets =
     selectedAssets.length > 0
       ? selectedAssets.filter((asset: string) => groupedData[asset])
-      : Object.keys(groupedData).slice(0, 5); // Show first 5 assets if none selected
+      : allAvailableAssets.slice(0, MAX_CHART_ASSETS); // Show up to MAX_CHART_ASSETS if none selected
 
   const datasets = filteredAssets.map((asset: string, index: number) => {
     const assetData = groupedData[asset];
@@ -254,11 +257,9 @@ export function ChartArea({
         <div className="flex items-center justify-between mb-4">
           <div className="flex flex-col gap-1">
             <h3 className="text-lg font-bold text-brand-900">
-              Performance Chart
+              {t.performanceChart}
             </h3>
-            <p className="text-sm font-normal text-neutral-700">
-              0 assets • No data available
-            </p>
+            <p className="text-sm font-normal text-neutral-700">{t.noData}</p>
           </div>
         </div>
         <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg">
@@ -300,11 +301,18 @@ export function ChartArea({
       <div className="relative flex items-center justify-between border-b border-neutral-200 px-6 py-5 gap-6 max-md:flex-col max-md:items-start">
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold text-brand-900">
-            Performance Chart
+            {t.performanceChart}
           </h3>
           <p className="text-sm font-normal text-neutral-700">
-            {filteredAssets.length} assets • Data through 2024-10 •{" "}
-            {showIndexed ? "Indexed value" : "Asset value"}
+            {filteredAssets.length} assets
+            {allAvailableAssets.length > MAX_CHART_ASSETS &&
+              selectedAssets.length === 0 && (
+                <span className="text-amber-600 font-medium">
+                  {" "}
+                  • Showing top {MAX_CHART_ASSETS} by performance
+                </span>
+              )}{" "}
+            • {t.dataThrough} • {showIndexed ? t.indexedValue : t.assetValue}
           </p>
         </div>
         {/*Right Side*/}
