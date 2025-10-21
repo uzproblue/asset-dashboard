@@ -55,7 +55,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
 
 
   return (
-    <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2">
+    <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2 ">
       {/* Table Header*/}
       <div className="flex flex-col items-start py-5 px-6 gap-4 justify-between">
         <button className="max-sm:w-90/100 max-sm:order-last sm:absolute top-5 right-6 rounded-xl py-2 px-3 gap-2 bg-brand-500 hover:bg-brand-900 text-sm font-medium text-white">
@@ -110,9 +110,10 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
       </div>
       {/* Table Body */}
       <div className="w-full xl:mx-[-8px] ">
-        <table className="min-w-full ">
-          <thead>
-            <tr className="max-xl:mb-4 xl:grid xl:grid-cols-9  max-xl:py-4 max-xl:px-4 xl:gap-4 xl:px-5 xl:py-2  text-neutral-700 text-left tracking-normal border-b border-t border-neutral-200 items-center flex justify-left xl:bg-table-row/80 max-xl:gap-2.5 ">
+        <div className="max-xl:overflow-x-auto w-full">
+          <table className="min-w-full ">
+          <thead >
+            <tr className="xl:grid xl:grid-cols-9  max-xl:py-4 max-xl:px-4 xl:gap-4 xl:px-5 xl:py-2  text-neutral-700 text-left tracking-normal border-b border-t border-neutral-200 items-center flex justify-left xl:bg-table-row/80 max-xl:gap-2.5">
               <th className="pl-3 min-w-40 text-xs font-medium min-h-5 max-xl:hidden">
                 Asset
               </th>
@@ -234,11 +235,13 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
             </tr>
           </thead>
         </table>
+        </div>
+        
 
         {/* Virtual scrolling container */}
         <div
           ref={parentRef}
-          className="h-96 overflow-auto"
+          className="h-96 overflow-y-auto max-xl:pt-4"
           style={{
             contain: "strict",
           }}
@@ -250,7 +253,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
               const performance = calculatePerformance(item);
 
               return (
-                <div className="xl:absolute top-0 left-0 width-full max-xl:bg-white/70 flex flex-row xl:h-auto max-xl:h-47.75 max-xl:w-full max-xl:justify-center"
+                <div className="xl:absolute top-0 left-0 width-full max-xl:bg-white/70 flex flex-row xl:h-auto max-xl:h-47.75 max-sm:h-70 max-xl:w-full max-xl:justify-center"
                   key={virtualItem.key}
                   style={{
                     transform: `translateY(${virtualItem.start}px)`,
@@ -333,7 +336,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                         </button>
                       </div>
                     </div>
-                    <div className="xl:hidden max-xl:rounded-lg max-xl:border max-xl:bg-white/70 max-xl:shadow-filter border-neutral-200 max-xl:flex max-xl:flex-col max-xl:gap-2 w-full">
+                    <div className="xl:hidden max-xl:rounded-lg max-xl:border max-xl:bg-white/70 max-xl:shadow-filter border-neutral-200 max-xl:flex max-xl:flex-col max-xl:gap-2">
                       <div className="flex flex-col border-b p-4 gap-3 border-neutral-200">
                         <div className="flex gap-2 justify-between">
                           <div className="text-neutral-900 text-base font-medium">
@@ -349,7 +352,7 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                           </button>
                         </div>
 
-                        <div className="flex gap-8 ">
+                        <div className="flex gap-8 max-sm:gap-2 w-full">
                           <div className="flex flex-col gap-2">
                             <span className="text-xs font-medium text-neutral-700">
                               Issue value
@@ -411,39 +414,39 @@ export function AssetsTable({ data, selectedAssets }: AssetsTableProps) {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-4 order-last p-4 gap-2">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-xs font-medium text-neutral-700">
+                      <div className="sm:grid sm:grid-cols-4 max-sm:justify-between max-sm:flex max-sm:flex-col p-4 gap-2">
+                        <div className="flex flex-col max-sm:flex-row gap-1">
+                          <span className="text-xs font-medium text-neutral-700 w-full max-sm:flex-1">
                             Category
                           </span>
-                          <div className="text-sm font-normal text-neutral-900">
+                          <div className="text-sm font-normal text-neutral-900 max-sm:flex-1">
                             {item.category_en}
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                          <span className="max-xl:text-xs font-medium text-neutral-700">
-                            Category
+                        <div className="flex flex-col max-sm:flex-row max-sm:items-center gap-1 w-full">
+                          <span className="max-xl:text-xs font-medium text-neutral-700 max-sm:flex-1">
+                            Subcategory
                           </span>
-                          <div className="text-sm font-normal text-neutral-900 truncate">
+                          <div className="text-sm font-normal text-neutral-900 truncate max-sm:flex-1">
                             {item.subcategory_en}
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                          <span className="text-xs font-medium text-neutral-700">
-                            Subcategory
+                        <div className="flex flex-col max-sm:flex-row gap-1 max-sm:items-center w-full">
+                          <span className="text-xs font-medium text-neutral-700 max-sm:flex-1">
+                            Expert
                           </span>
-                          <div className="text-sm font-normal text-neutral-900 truncate">
+                          <div className="text-sm font-normal text-neutral-900 truncate max-sm:flex-1">
                             {item.expert}
                           </div>
                         </div>
 
-                        <div className="max-xl:flex max-xl:flex-col max-xl:gap-1">
-                          <span className="xl:hidden max-xl:text-xs max-xl:font-medium max-xl:text-neutral-700">
+                        <div className="flex flex-col gap-1 max-sm:flex-row max-sm:items-center w-full">
+                          <span className="xl:hidden max-xl:text-xs max-xl:font-medium max-xl:text-neutral-700 max-sm:flex-1">
                             Release date
                           </span>
-                          <div className="text-sm font-normal text-neutral-900 truncate">
+                          <div className="text-sm font-normal text-neutral-900 truncate max-sm:flex-1">
                             {new Date(
                               item.release_date_formatted
                             ).toLocaleDateString("en-US", {
