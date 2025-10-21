@@ -145,7 +145,7 @@ function HomePage() {
     loadData();
   }, []);
 
-  // Get dynamic filter options based on current selections (cascading filters)
+  // Get dynamic filter options based on current selections
   const filterOptions = useMemo(() => {
     const currentFilters = {
       categories: selectedCategories,
@@ -154,7 +154,6 @@ function HomePage() {
       assets: selectedAssets,
     };
 
-    // Use optimized indexes for initial data, fallback to processed data
     const baseData = optimizedData?.data || processedData;
 
     return getFilteredOptions(baseData, currentFilters);
@@ -169,19 +168,39 @@ function HomePage() {
 
   const { categories, subcategories, experts, assets } = filterOptions;
 
-  // Calculate min/max dates from dataset
-  const dateRange = useMemo(() => {
-    if (processedData.length === 0) {
-      return { minDate: "", maxDate: "" };
+  // Auto-clear invalid selections when dependencies change
+  useEffect(() => {
+    if (selectedSubcategories.length > 0) {
+      const validSubcategories = selectedSubcategories.filter(
+        (subcategory: string) => subcategories.includes(subcategory)
+      );
+      if (validSubcategories.length !== selectedSubcategories.length) {
+        setSelectedSubcategories(validSubcategories);
+      }
     }
+  }, [subcategories, selectedSubcategories]);
 
-    const dates = processedData.map((item) => item.price_date_formatted);
-    const sortedDates = dates.sort();
-    return {
-      minDate: sortedDates[0],
-      maxDate: sortedDates[sortedDates.length - 1],
-    };
-  }, [processedData]);
+  useEffect(() => {
+    if (selectedExperts.length > 0) {
+      const validExperts = selectedExperts.filter((expert: string) =>
+        experts.includes(expert)
+      );
+      if (validExperts.length !== selectedExperts.length) {
+        setSelectedExperts(validExperts);
+      }
+    }
+  }, [experts, selectedExperts]);
+
+  useEffect(() => {
+    if (selectedAssets.length > 0) {
+      const validAssets = selectedAssets.filter((asset: string) =>
+        assets.includes(asset)
+      );
+      if (validAssets.length !== selectedAssets.length) {
+        setSelectedAssets(validAssets);
+      }
+    }
+  }, [assets, selectedAssets]);
 
   // Filter data based on selections
   const filteredData = useMemo(() => {
@@ -370,39 +389,77 @@ function HomePage() {
 
                   <div className="relative">
                     <p className="text-sm font-medium text-neutral-900">
-                      {t.date}
+                      Date range
                     </p>
-                    <div className="mt-2">
-                      <DateRangeFilter
-                        startDate={startDate}
-                        endDate={endDate}
-                        onStartDateChange={setStartDate}
-                        onEndDateChange={setEndDate}
-                        minDate={dateRange.minDate}
-                        maxDate={dateRange.maxDate}
-                        language={language}
-                      />
-                    </div>
+                    <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
+                      <span className="flex items-center">
+                        <svg
+                          className="w-4 h-4 mr-2 text-neutral-700"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Select range
+                      </span>
+                    </button>
                   </div>
                 </>
               ) : (
                 <div className="relative">
                   <p className="text-sm font-medium text-neutral-900">
-                    {t.date}
+                    Date range
                   </p>
-                  <div className="mt-2">
-                    <DateRangeFilter
-                      startDate={startDate}
-                      endDate={endDate}
-                      onStartDateChange={setStartDate}
-                      onEndDateChange={setEndDate}
-                      minDate={dateRange.minDate}
-                      maxDate={dateRange.maxDate}
-                      language={language}
-                    />
-                  </div>
+                  <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-2 mt-2 focus:ring-1 focus:border-brand-100 focus:ring-inset focus:ring-brand-100 text-neutral-700">
+                    <span className="flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-2 text-neutral-700"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Select range
+                    </span>
+                  </button>
                 </div>
               )}
+
+              <div className="relative">
+                <p className="text-sm font-medium text-neutral-900">
+                  Date range
+                </p>
+                <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
+                  <span className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-2 text-neutral-700"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Select range
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -425,11 +482,9 @@ function HomePage() {
           />
         </div>
 
-        <span className="w-full bg-line h-0.5 my-2" ></span>
-
         {/* Footer Disclaimer */}
-        <div className="rounded-4xl p-4 border-8 bg-white/70 border-neutral-200/50 shadow-filter gap-2.5 ">
-          <p className="text-sm font-normal text-neutral-700 text-center">
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
             Values are estimates: past performance is not indicative of future
             results.
           </p>

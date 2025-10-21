@@ -319,6 +319,84 @@ export function clearChartDataCache() {
   chartDataCache.clear();
 }
 
+export function getFilteredOptions(
+  data: ProcessedAssetData[],
+  currentFilters: {
+    categories: string[];
+    subcategories: string[];
+    experts: string[];
+    assets: string[];
+  }
+): {
+  categories: string[];
+  subcategories: string[];
+  experts: string[];
+  assets: string[];
+} {
+  let filteredData = data;
+
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    filteredData = filteredData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    filteredData = filteredData.filter((item) => expertSet.has(item.expert));
+  }
+
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    filteredData = filteredData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+
+  const availableCategories = getUniqueValues(data, "category_en");
+
+  let subcategoryData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    subcategoryData = subcategoryData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    subcategoryData = subcategoryData.filter((item) =>
+      expertSet.has(item.expert)
+    );
+  }
+  const availableSubcategories = getUniqueValues(
+    subcategoryData,
+    "subcategory_en"
+  );
+
+  let expertData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    expertData = expertData.filter((item) => categorySet.has(item.category_en));
+  }
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    expertData = expertData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+  const availableExperts = getUniqueValues(expertData, "expert");
+
+  const availableAssets = getUniqueValues(filteredData, "asset_en");
+
+  return {
+    categories: availableCategories,
+    subcategories: availableSubcategories,
+    experts: availableExperts,
+    assets: availableAssets,
+  };
+}
+
 // Clear all caches for memory management
 export function clearAllCaches() {
   chartDataCache.clear();

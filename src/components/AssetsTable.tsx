@@ -136,7 +136,60 @@ export function AssetsTable({
     };
   };
 
+  const downloadCSV = () => {
+    if (filteredData.length === 0) {
+      return;
+    }
 
+    const headers = [
+      t.asset,
+      t.category,
+      t.subcategory,
+      t.expert,
+      t.releaseDate,
+      t.issueValue,
+      t.currentValue,
+      t.performance,
+    ];
+
+    const rows = filteredData.map((item) => {
+      const perf = calculatePerformance(item);
+      return [
+        item.asset_en,
+        item.category_en,
+        item.subcategory_en,
+        item.expert,
+        item.release_date_formatted,
+        item.issuance_value_eur.toFixed(2),
+        item.value_eur.toFixed(2),
+        `${perf.percentage.toFixed(2)}%`,
+      ];
+    });
+
+    const csvContent = [
+      headers.map((header) => `"${header.replace(/"/g, '""')}"`).join(","),
+      ...rows.map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `assets-export-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="relative bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 p-2 ">
@@ -200,131 +253,125 @@ export function AssetsTable({
       <div className="w-full xl:mx-[-8px] ">
         <div className="max-xl:overflow-x-auto w-full">
           <table className="min-w-full ">
-          <thead >
-            <tr className="xl:grid xl:grid-cols-9  max-xl:py-4 max-xl:px-4 xl:gap-4 xl:px-5 xl:py-2  text-neutral-700 text-left tracking-normal border-b border-t border-neutral-200 items-center flex justify-left xl:bg-table-row/80 max-xl:gap-2.5">
-              <th className="pl-3 min-w-40 text-xs font-medium min-h-5 max-xl:hidden">
-                Asset
-              </th>
-              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
-                Category
-              </th>
-              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
-                Subcategory
-              </th>
-              <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
-                Expert
-              </th>
-              <th className="max-xl:rounded-lg max-xl:py-2 text-center max-xl:px-3 xl:pr-3 text-xs font-medium min-h-5 min-w-30.5 max-xl:bg-table-row/80 max-xl:h-9 max-xl:order-4">
-                <span className="flex gap-2 items-center xl:justify-left max-xl:justify-center">
-                  Release date
-                  <svg
-                    width="11.33"
-                    height="8"
-                    viewBox="0 0 11.33 8"
-                    fill="none"
-                    stroke="#7E7F7A"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+            <thead>
+              <tr className="xl:grid xl:grid-cols-9  max-xl:py-4 max-xl:px-4 xl:gap-4 xl:px-5 xl:py-2  text-neutral-700 text-left tracking-normal border-b border-t border-neutral-200 items-center flex justify-left xl:bg-table-row/80 max-xl:gap-2.5">
+                <th className="pl-3 min-w-40 text-xs font-medium min-h-5 max-xl:hidden">
+                  {t.asset}
+                </th>
+                <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
+                  {t.category}
+                </th>
+                <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
+                  {t.subcategory}
+                </th>
+                <th className="min-w-40 pl-3 text-xs font-medium min-h-5 max-xl:hidden">
+                  {t.expert}
+                </th>
+                <th className="max-xl:rounded-lg max-xl:py-2 text-center max-xl:px-3 xl:pr-3 text-xs font-medium min-h-5 min-w-30.5 max-xl:bg-table-row/80 max-xl:h-9 max-xl:order-4">
+                  <span className="flex gap-2 items-center xl:justify-left max-xl:justify-center">
+                    {t.releaseDate}
+                    <svg
+                      width="11.33"
+                      height="8"
+                      viewBox="0 0 11.33 8"
+                      fill="none"
+                      stroke="#7E7F7A"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="0.6" y1="1" x2="7.5" y2="1" />
 
-                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                      <line x1="0.6" y1="4" x2="6.2" y2="4" />
 
-                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                      <line x1="0.6" y1="7" x2="4.7" y2="7" />
 
-                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+                      <line x1="9.5" y1="1" x2="9.5" y2="7" />
 
-                    <polyline points="8 5.3 9.5 7 11 5.3" />
-                  </svg>
+                      <polyline points="8 5.3 9.5 7 11 5.3" />
+                    </svg>
+                  </span>
+                </th>
+                <th className="max-xl:rounded-lg max-xl:px-3 max-xl:py-2 xl:pl-4 text-xs font-medium min-h-5 min-w-28.5 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-3">
+                  <span className="flex gap-2 pl-2 items-center justify-left max-xl:justify-center ">
+                    {t.issueValue}
+                    <svg
+                      width="11.33"
+                      height="8"
+                      viewBox="0 0 11.33 8"
+                      fill="none"
+                      stroke="#7E7F7A"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="0.6" y1="1" x2="7.5" y2="1" />
 
-                </span>
-              </th>
-              <th className="max-xl:rounded-lg max-xl:px-3 max-xl:py-2 xl:pl-4 text-xs font-medium min-h-5 min-w-28.5 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-3">
-                <span className="flex gap-2 pl-2 items-center justify-left max-xl:justify-center ">
-                  Issue value
-                  <svg
-                    width="11.33"
-                    height="8"
-                    viewBox="0 0 11.33 8"
-                    fill="none"
-                    stroke="#7E7F7A"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+                      <line x1="0.6" y1="4" x2="6.2" y2="4" />
 
-                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                      <line x1="0.6" y1="7" x2="4.7" y2="7" />
 
-                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                      <line x1="9.5" y1="1" x2="9.5" y2="7" />
 
-                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+                      <polyline points="8 5.3 9.5 7 11 5.3" />
+                    </svg>
+                  </span>
+                </th>
+                <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-31.5 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-2">
+                  <span className="flex gap-2 items-center justify-left max-xl:justify-center">
+                    {t.currentValue}
+                    <svg
+                      width="11.33"
+                      height="8"
+                      viewBox="0 0 11.33 8"
+                      fill="none"
+                      stroke="#7E7F7A"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="0.6" y1="1" x2="7.5" y2="1" />
 
-                    <polyline points="8 5.3 9.5 7 11 5.3" />
-                  </svg>
-                </span>
+                      <line x1="0.6" y1="4" x2="6.2" y2="4" />
 
+                      <line x1="0.6" y1="7" x2="4.7" y2="7" />
 
-              </th>
-              <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-31.5 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-2">
-                <span className="flex gap-2 items-center justify-left max-xl:justify-center">
-                  Current value
-                  <svg
-                    width="11.33"
-                    height="8"
-                    viewBox="0 0 11.33 8"
-                    fill="none"
-                    stroke="#7E7F7A"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+                      <line x1="9.5" y1="1" x2="9.5" y2="7" />
 
-                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
+                      <polyline points="8 5.3 9.5 7 11 5.3" />
+                    </svg>
+                  </span>
+                </th>
+                <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-30.75 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-1">
+                  <span className="flex gap-2 items-center max-xl:justify-center">
+                    {t.performance}
+                    <svg
+                      width="11.33"
+                      height="8"
+                      viewBox="0 0 11.33 8"
+                      fill="none"
+                      stroke="#7E7F7A"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="0.6" y1="1" x2="7.5" y2="1" />
 
-                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
+                      <line x1="0.6" y1="4" x2="6.2" y2="4" />
 
-                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
+                      <line x1="0.6" y1="7" x2="4.7" y2="7" />
 
-                    <polyline points="8 5.3 9.5 7 11 5.3" />
-                  </svg>
-                </span>
-              </th>
-              <th className="xl:pl-3 text-xs font-medium min-h-5 min-w-30.75 max-xl:rounded-lg max-xl:px-3 max-xl:py-2 max-xl:bg-table-row/80  max-xl:h-9 max-xl:order-1">
-                <span className="flex gap-2 items-center max-xl:justify-center">
-                  Performance
-                  <svg
-                    width="11.33"
-                    height="8"
-                    viewBox="0 0 11.33 8"
-                    fill="none"
-                    stroke="#7E7F7A"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="0.6" y1="1" x2="7.5" y2="1" />
+                      <line x1="9.5" y1="1" x2="9.5" y2="7" />
 
-                    <line x1="0.6" y1="4" x2="6.2" y2="4" />
-
-                    <line x1="0.6" y1="7" x2="4.7" y2="7" />
-
-                    <line x1="9.5" y1="1" x2="9.5" y2="7" />
-
-                    <polyline points="8 5.3 9.5 7 11 5.3" />
-                  </svg>
-                </span>
-              </th>
-              <th className="max-w-15">
-                {/* Star column */}
-              </th>
-            </tr>
-          </thead>
-        </table>
+                      <polyline points="8 5.3 9.5 7 11 5.3" />
+                    </svg>
+                  </span>
+                </th>
+                <th className="max-w-15">{/* Star column */}</th>
+              </tr>
+            </thead>
+          </table>
         </div>
-        
 
         {/* Virtual scrolling container */}
         <div
@@ -334,14 +381,14 @@ export function AssetsTable({
             contain: "strict",
           }}
         >
-          <div className="relative w-full h-auto "
-          >
+          <div className="relative w-full h-auto ">
             {virtualizer.getVirtualItems().map((virtualItem) => {
               const item = filteredData[virtualItem.index];
               const performance = calculatePerformance(item);
 
               return (
-                <div className="xl:absolute top-0 left-0 width-full max-xl:bg-white/70 flex flex-row xl:h-auto max-xl:h-47.75 max-sm:h-70 max-xl:w-full max-xl:justify-center"
+                <div
+                  className="xl:absolute top-0 left-0 width-full max-xl:bg-white/70 flex flex-row xl:h-auto max-xl:h-47.75 max-sm:h-70 max-xl:w-full max-xl:justify-center"
                   key={virtualItem.key}
                   style={{
                     transform: `translateY(${virtualItem.start}px)`,
@@ -349,9 +396,6 @@ export function AssetsTable({
                 >
                   <div className="xl:hover:bg-gray-50 xl:border-b border-neutral-200 max-xl:w-73/79">
                     <div className="max-xl:hidden bg-white/70 xl:pr-3 xl:pl-7 xl:py-2 xl:grid xl:grid-cols-9 xl:gap-8 xl:min-h-12.5 xl:items-center ">
-
-
-
                       <div className="text-sm font-normal text-neutral-900 truncate">
                         {item.asset_en}
                       </div>
@@ -380,10 +424,11 @@ export function AssetsTable({
                       </div>
                       <div className="text-right">
                         <span
-                          className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${performance.isPositive
-                            ? "text-green-600 border-green-200 bg-green-50"
-                            : "text-red-600 border-red-200 bg-red-50"
-                            }`}
+                          className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${
+                            performance.isPositive
+                              ? "text-green-600 border-green-200 bg-green-50"
+                              : "text-red-600 border-red-200 bg-red-50"
+                          }`}
                         >
                           {performance.isPositive ? (
                             <svg
@@ -418,7 +463,8 @@ export function AssetsTable({
                           <svg
                             className="w-4 h-4"
                             fill="currentColor"
-                            viewBox="0 0 20 20"                          >
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                           </svg>
                         </button>
@@ -434,7 +480,8 @@ export function AssetsTable({
                             <svg
                               className="w-4 h-4"
                               fill="currentColor"
-                              viewBox="0 0 20 20"                          >
+                              viewBox="0 0 20 20"
+                            >
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                           </button>
@@ -443,7 +490,7 @@ export function AssetsTable({
                         <div className="flex gap-8 max-sm:gap-2 w-full">
                           <div className="flex flex-col gap-2">
                             <span className="text-xs font-medium text-neutral-700">
-                              Issue value
+                              {t.issueValue}
                             </span>
                             <div className="text-sm font-medium text-neutral-900 truncate text-right">
                               €{item.issuance_value_eur.toFixed(2)}
@@ -452,7 +499,7 @@ export function AssetsTable({
 
                           <div className="flex flex-col gap-2 items-start">
                             <span className="text-xs font-medium text-neutral-700">
-                              Current value
+                              {t.currentValue}
                             </span>
                             <div className="text-sm font-medium text-neutral-900 truncate text-right">
                               €{item.value_eur.toFixed(2)}
@@ -461,14 +508,15 @@ export function AssetsTable({
 
                           <div className="flex flex-col gap-2 items-start">
                             <span className="text-xs font-medium text-neutral-700">
-                              Performance
+                              {t.performance}
                             </span>
                             <div className="text-right">
                               <span
-                                className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${performance.isPositive
-                                  ? "text-green-600 border-green-200 bg-green-50"
-                                  : "text-red-600 border-red-200 bg-red-50"
-                                  }`}
+                                className={`py-1 px-2 gap-1 text-xs font-medium rounded-4xl inline-flex border items-center ${
+                                  performance.isPositive
+                                    ? "text-green-600 border-green-200 bg-green-50"
+                                    : "text-red-600 border-red-200 bg-red-50"
+                                }`}
                               >
                                 {performance.isPositive ? (
                                   <svg

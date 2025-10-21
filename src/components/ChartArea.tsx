@@ -100,8 +100,6 @@ export function ChartArea({
   });
 
   // Filter to only selected assets
-  // If no specific assets are selected, show all available assets in the filtered dataset
-  // For performance reasons, limit to 30 assets maximum with user notification
   const MAX_CHART_ASSETS = 30;
   const allAvailableAssets = Object.keys(groupedData);
 
@@ -261,9 +259,7 @@ export function ChartArea({
             <h3 className="text-lg font-bold text-brand-900">
               {t.performanceChart}
             </h3>
-            <p className="text-sm font-normal text-neutral-700">
-              0 assets • {t.noData}
-            </p>
+            <p className="text-sm font-normal text-neutral-700">{t.noData}</p>
           </div>
         </div>
         <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg">
