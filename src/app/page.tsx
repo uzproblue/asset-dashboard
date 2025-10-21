@@ -436,30 +436,6 @@ function HomePage() {
                   </button>
                 </div>
               )}
-
-              <div className="relative">
-                <p className="text-sm font-medium text-neutral-900">
-                  Date range
-                </p>
-                <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
-                  <span className="flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2 text-neutral-700"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    Select range
-                  </span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
