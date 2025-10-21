@@ -59,6 +59,7 @@ export const translations = {
     clearAll: "Clear All",
     loading: "Loading...",
     noData: "No data available",
+    // New translations
     performanceChart: "Performance Chart",
     assetsDetail: "Assets detail",
     downloadCSV: "Download CSV",
@@ -77,8 +78,14 @@ export const translations = {
     performance: "Performance",
     assetsInSelection: "assets in current selection",
     dataThrough: "Data through 2024-10",
+    indexedValue: "Indexed value",
     assetValue: "Asset value",
     indexTo100: "Index to 100 at release",
+    startDate: "Start date",
+    endDate: "End date",
+    clearDates: "Clear dates",
+    applyDates: "Apply",
+    selectDateRange: "Select date range",
   },
   de: {
     title: "Asset-Wert Dashboard",
@@ -95,6 +102,7 @@ export const translations = {
     clearAll: "Alle löschen",
     loading: "Laden...",
     noData: "Keine Daten verfügbar",
+    // New translations
     performanceChart: "Leistungsdiagramm",
     assetsDetail: "Asset-Details",
     downloadCSV: "CSV herunterladen",
@@ -113,8 +121,14 @@ export const translations = {
     performance: "Performance",
     assetsInSelection: "Assets in aktueller Auswahl",
     dataThrough: "Daten bis 2024-10",
+    indexedValue: "Indexierter Wert",
     assetValue: "Asset-Wert",
     indexTo100: "Index auf 100 bei Veröffentlichung",
+    startDate: "Startdatum",
+    endDate: "Enddatum",
+    clearDates: "Daten löschen",
+    applyDates: "Anwenden",
+    selectDateRange: "Datumsbereich auswählen",
   },
   fr: {
     title: "Tableau de Bord des Valeurs d'Actifs",
@@ -131,6 +145,7 @@ export const translations = {
     clearAll: "Tout effacer",
     loading: "Chargement...",
     noData: "Aucune donnée disponible",
+    // New translations
     performanceChart: "Graphique de Performance",
     assetsDetail: "Détails des Actifs",
     downloadCSV: "Télécharger CSV",
@@ -149,8 +164,14 @@ export const translations = {
     performance: "Performance",
     assetsInSelection: "actifs dans la sélection actuelle",
     dataThrough: "Données jusqu'en 2024-10",
+    indexedValue: "Valeur indexée",
     assetValue: "Valeur de l'actif",
     indexTo100: "Index à 100 à la sortie",
+    startDate: "Date de début",
+    endDate: "Date de fin",
+    clearDates: "Effacer les dates",
+    applyDates: "Appliquer",
+    selectDateRange: "Sélectionner la plage de dates",
   },
 };
 
@@ -380,4 +401,91 @@ export function getFilteredOptions(
 export function clearAllCaches() {
   chartDataCache.clear();
   // Clear any other caches here
+}
+
+// Get filtered options for cascading filters
+export function getFilteredOptions(
+  data: ProcessedAssetData[],
+  currentFilters: {
+    categories: string[];
+    subcategories: string[];
+    experts: string[];
+    assets: string[];
+  }
+): {
+  categories: string[];
+  subcategories: string[];
+  experts: string[];
+  assets: string[];
+} {
+  // Start with all data
+  let filteredData = data;
+
+  // Apply category filter first (if any selected)
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    filteredData = filteredData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+
+  // Apply expert filter (if any selected)
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    filteredData = filteredData.filter((item) => expertSet.has(item.expert));
+  }
+
+  // Apply subcategory filter (if any selected)
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    filteredData = filteredData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+
+  // Now compute available options based on current filtered data
+  const availableCategories = getUniqueValues(data, "category_en");
+
+  // For subcategories: show only those that exist for selected categories + experts
+  let subcategoryData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    subcategoryData = subcategoryData.filter((item) =>
+      categorySet.has(item.category_en)
+    );
+  }
+  if (currentFilters.experts.length > 0) {
+    const expertSet = new Set(currentFilters.experts);
+    subcategoryData = subcategoryData.filter((item) =>
+      expertSet.has(item.expert)
+    );
+  }
+  const availableSubcategories = getUniqueValues(
+    subcategoryData,
+    "subcategory_en"
+  );
+
+  // For experts: show only those that exist for selected categories + subcategories
+  let expertData = data;
+  if (currentFilters.categories.length > 0) {
+    const categorySet = new Set(currentFilters.categories);
+    expertData = expertData.filter((item) => categorySet.has(item.category_en));
+  }
+  if (currentFilters.subcategories.length > 0) {
+    const subcategorySet = new Set(currentFilters.subcategories);
+    expertData = expertData.filter((item) =>
+      subcategorySet.has(item.subcategory_en)
+    );
+  }
+  const availableExperts = getUniqueValues(expertData, "expert");
+
+  // For assets: show only those that exist for all selected filters
+  const availableAssets = getUniqueValues(filteredData, "asset_en");
+
+  return {
+    categories: availableCategories,
+    subcategories: availableSubcategories,
+    experts: availableExperts,
+    assets: availableAssets,
+  };
 }

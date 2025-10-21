@@ -25,6 +25,7 @@ export function FilterSelect({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const t = translations[language];
 
+  // Auto-close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

@@ -13,6 +13,7 @@ import { ChartArea } from "@/components/ChartArea";
 import { FilterSelect } from "@/components/FilterSelect";
 import { TabNavigation } from "@/components/TabNavigation";
 import { AssetsTable } from "@/components/AssetsTable";
+import { DateRangeFilter } from "@/components/DateRangeFilter";
 import {
   AssetData,
   ProcessedAssetData,
@@ -45,6 +46,10 @@ function HomePage() {
   );
   const [selectedExperts, setSelectedExperts] = useState<string[]>([]);
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+
+  // Date filter states
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   // Use transition for non-urgent updates
   const [isPending, startTransition] = useTransition();
@@ -199,18 +204,34 @@ function HomePage() {
 
   // Filter data based on selections
   const filteredData = useMemo(() => {
-    return filterData(processedData, {
+    let filtered = filterData(processedData, {
       categories: selectedCategories,
       subcategories: selectedSubcategories,
       experts: selectedExperts,
       assets: selectedAssets,
     });
+
+    // Apply date range filter
+    if (startDate) {
+      filtered = filtered.filter(
+        (item) => item.price_date_formatted >= startDate
+      );
+    }
+    if (endDate) {
+      filtered = filtered.filter(
+        (item) => item.price_date_formatted <= endDate
+      );
+    }
+
+    return filtered;
   }, [
     processedData,
     selectedCategories,
     selectedSubcategories,
     selectedExperts,
     selectedAssets,
+    startDate,
+    endDate,
   ]);
 
   // Get available assets from filtered data
@@ -221,17 +242,42 @@ function HomePage() {
     return Array.from(assetSet).sort();
   }, [filteredData]);
 
-  // Update selected assets when filtered data changes
+  // Auto-clear invalid filter selections when dependencies change
   useEffect(() => {
+    // Clear invalid subcategories
+    if (selectedSubcategories.length > 0) {
+      const validSubcategories = selectedSubcategories.filter(
+        (subcategory: string) => subcategories.includes(subcategory)
+      );
+      if (validSubcategories.length !== selectedSubcategories.length) {
+        setSelectedSubcategories(validSubcategories);
+      }
+    }
+  }, [subcategories, selectedSubcategories]);
+
+  useEffect(() => {
+    // Clear invalid experts
+    if (selectedExperts.length > 0) {
+      const validExperts = selectedExperts.filter((expert: string) =>
+        experts.includes(expert)
+      );
+      if (validExperts.length !== selectedExperts.length) {
+        setSelectedExperts(validExperts);
+      }
+    }
+  }, [experts, selectedExperts]);
+
+  useEffect(() => {
+    // Clear invalid assets
     if (selectedAssets.length > 0) {
       const validAssets = selectedAssets.filter((asset: string) =>
-        availableAssets.includes(asset)
+        assets.includes(asset)
       );
       if (validAssets.length !== selectedAssets.length) {
         setSelectedAssets(validAssets);
       }
     }
-  }, [availableAssets, selectedAssets]);
+  }, [assets, selectedAssets]);
 
   // Debounced filter handlers with transitions for better performance
   const debouncedSetCategories = useCallback(

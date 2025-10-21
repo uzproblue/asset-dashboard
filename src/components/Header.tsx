@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Logo from "../../public/Logo.png";
 import Image from "next/image";
 import { Language } from "@/lib/data";
+import { useState, useRef, useEffect } from "react";
 
 interface HeaderProps {
   language: Language;
@@ -21,6 +22,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
   const currentLanguage =
     languages.find((lang) => lang.code === language) || languages[0];
 
+  // Auto-close language dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -52,6 +54,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
           height={20}
         />
 
+        {/* Language Switcher */}
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
@@ -77,6 +80,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
             </svg>
           </button>
 
+          {/* Language Dropdown */}
           {isLanguageDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-200 rounded-xl shadow-lg z-50">
               <div className="py-1">

@@ -264,11 +264,11 @@ export function ChartArea({
         </div>
         <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg">
           <div className="text-center">
-            <div className="text-gray-500 text-lg mb-2">No data available</div>
+            <div className="text-gray-500 text-lg mb-2">{t.noData}</div>
             <div className="text-gray-400 text-sm">
               {selectedAssets.length === 0
                 ? "Select assets to view their performance"
-                : "No data available for selected assets"}
+                : t.noData}
             </div>
           </div>
         </div>
@@ -335,7 +335,7 @@ export function ChartArea({
             </div>
           </button>
           <p className="flex-nowrap leading-tight  font-medium text-sm transition-colors align-middle min-h-4">
-            Index to 100 at release
+            {t.indexTo100}
           </p>
         </div>
         <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">

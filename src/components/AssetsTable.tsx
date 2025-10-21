@@ -19,7 +19,79 @@ export function AssetsTable({
   const parentRef = useRef<HTMLDivElement>(null);
   const t = translations[language];
 
-  // Filter data based on selected assets and search term (memoized for performance)
+  // Calculate performance percentage
+  const calculatePerformance = (item: ProcessedAssetData) => {
+    const performance =
+      ((item.value_eur - item.issuance_value_eur) / item.issuance_value_eur) *
+      100;
+    return {
+      percentage: performance,
+      isPositive: performance >= 0,
+    };
+  };
+
+  // CSV download function
+  const downloadCSV = () => {
+    if (filteredData.length === 0) {
+      return; // Don't download if no data
+    }
+
+    // Define CSV headers (translated)
+    const headers = [
+      t.asset,
+      t.category,
+      t.subcategory,
+      t.expert,
+      t.releaseDate,
+      t.issueValue,
+      t.currentValue,
+      t.performance,
+    ];
+
+    // Convert data to CSV rows
+    const rows = filteredData.map((item) => {
+      const perf = calculatePerformance(item);
+      return [
+        item.asset_en,
+        item.category_en,
+        item.subcategory_en,
+        item.expert,
+        item.release_date_formatted,
+        item.issuance_value_eur.toFixed(2),
+        item.value_eur.toFixed(2),
+        `${perf.percentage.toFixed(2)}%`,
+      ];
+    });
+
+    // Combine headers and rows with proper CSV escaping
+    const csvContent = [
+      headers.map((header) => `"${header.replace(/"/g, '""')}"`).join(","),
+      ...rows.map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(",")
+      ),
+    ].join("\n");
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `assets-export-${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+
+  // Filter and sort data based on selected assets and search term (memoized for performance)
   const filteredData = useMemo(() => {
     return data
       .filter(
@@ -35,7 +107,13 @@ export function AssetsTable({
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           item.expert.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      )
+      .sort((a, b) => {
+        // Sort by performance (descending) - best performers first
+        const perfA = calculatePerformance(a).percentage;
+        const perfB = calculatePerformance(b).percentage;
+        return perfB - perfA;
+      });
   }, [data, selectedAssets, searchTerm]);
 
   // Virtual scrolling setup - optimized for performance
