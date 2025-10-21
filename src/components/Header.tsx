@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import Logo from "../../public/Logo.png";
 import Image from "next/image";
 import { Language } from "@/lib/data";
-import { useState, useRef, useEffect } from "react";
 
 interface HeaderProps {
   language: Language;
@@ -61,7 +60,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
             onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-neutral-700 bg-white/70 border border-neutral-200 rounded-xl hover:border-brand-100 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-100 focus:border-brand-100 transition-colors"
           >
-            <span className="text-lg">{currentLanguage.flag}</span>
+            {/* <span className="text-lg">{currentLanguage.flag}</span> */}
             <span>{currentLanguage.code.toUpperCase()}</span>
             <svg
               className={`w-4 h-4 text-neutral-500 transition-transform ${
@@ -82,8 +81,8 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
 
           {/* Language Dropdown */}
           {isLanguageDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-neutral-200 rounded-xl shadow-lg z-50">
-              <div className="py-1">
+            <div className="absolute right-0 mt-2 w-48 bg-white border overflow-hidden border-neutral-200 rounded-xl shadow-lg z-50">
+              <div>
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
@@ -97,7 +96,7 @@ export function Header({ language, onLanguageChange }: HeaderProps) {
                         : "text-neutral-700"
                     }`}
                   >
-                    <span className="text-lg">{lang.flag}</span>
+                    {/* <span className="text-lg">{lang.flag}</span> */}
                     <span>{lang.name}</span>
                     {language === lang.code && (
                       <svg

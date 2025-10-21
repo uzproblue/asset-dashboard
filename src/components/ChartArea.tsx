@@ -7,7 +7,6 @@ import {
   translations,
   getMemoizedChartData,
 } from "@/lib/data";
-import ArrowsMaximize from "../../public/arrows-maximize.png";
 import Image from "next/image";
 
 // Lazy load chart components
@@ -340,7 +339,9 @@ export function ChartArea({
         </div>
         <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">
           <Image
-            src={ArrowsMaximize}
+            src="/arrows-maximize.png"
+            width={16}
+            height={16}
             alt="maximize"
             className="absolute md:top-2 w-4 h-4"
           />
