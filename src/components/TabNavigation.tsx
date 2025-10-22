@@ -1,11 +1,20 @@
 "use client";
 
+import { Language, translations } from "@/lib/data";
+
 interface TabNavigationProps {
   activeTab: "search" | "basket";
   onTabChange: (tab: "search" | "basket") => void;
+  language: Language;
 }
 
-export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
+export function TabNavigation({
+  activeTab,
+  onTabChange,
+  language,
+}: TabNavigationProps) {
+  const t = translations[language];
+
   return (
     <div className="flex border-b border-neutral-200">
       <button
@@ -16,7 +25,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
             : "border-transparent hover:text-border-700"
         }`}
       >
-        Asset search
+        {t.assetSearch}
       </button>
       <button
         onClick={() => onTabChange("basket")}
@@ -26,7 +35,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
             : "border-transparent hover:text-brand-700"
         }`}
       >
-        Custom basket
+        {t.customBasket}
       </button>
     </div>
   );

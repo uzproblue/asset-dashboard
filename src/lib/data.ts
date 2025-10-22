@@ -84,6 +84,11 @@ export const translations = {
     clearDates: "Clear dates",
     applyDates: "Apply",
     selectDateRange: "Select date range",
+    assetSearch: "Asset search",
+    customBasket: "Custom basket",
+    showingTopByPerformance: "Showing top",
+    byPerformance: "by performance",
+    assets: "assets",
   },
   de: {
     title: "Asset-Wert Dashboard",
@@ -126,6 +131,11 @@ export const translations = {
     clearDates: "Daten löschen",
     applyDates: "Anwenden",
     selectDateRange: "Datumsbereich auswählen",
+    assetSearch: "Asset-Suche",
+    customBasket: "Eigener Korb",
+    showingTopByPerformance: "Top wird angezeigt",
+    byPerformance: "nach Performance",
+    assets: "Assets",
   },
   fr: {
     title: "Tableau de Bord des Valeurs d'Actifs",
@@ -168,6 +178,11 @@ export const translations = {
     clearDates: "Effacer les dates",
     applyDates: "Appliquer",
     selectDateRange: "Sélectionner la plage de dates",
+    assetSearch: "Recherche d'actifs",
+    customBasket: "Panier personnalisé",
+    showingTopByPerformance: "Affichage du top",
+    byPerformance: "par performance",
+    assets: "actifs",
   },
 };
 

@@ -382,7 +382,11 @@ function HomePage() {
 
         {/* Filter Section with Tabs */}
         <div className="bg-white/70 rounded-4xl shadow-filter border-neutral-200/50 border-8 px-6 py-5">
-          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+          <TabNavigation
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            language={language}
+          />
 
           <div className="pt-5">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

@@ -355,12 +355,13 @@ export function ChartArea({
             {t.performanceChart}
           </h3>
           <p className="text-sm font-normal text-neutral-700">
-            {filteredAssets.length} assets
+            {filteredAssets.length} {t.assets}
             {allAvailableAssets.length > MAX_CHART_ASSETS &&
               selectedAssets.length === 0 && (
                 <span className="text-amber-600 font-medium">
                   {" "}
-                  • Showing top {MAX_CHART_ASSETS} by performance
+                  • {t.showingTopByPerformance} {MAX_CHART_ASSETS}{" "}
+                  {t.byPerformance}
                 </span>
               )}{" "}
             • {t.dataThrough} {getLatestDate()} •{" "}
