@@ -7,7 +7,6 @@ import {
   translations,
   getMemoizedChartData,
 } from "@/lib/data";
-import ArrowsMaximize from "../../public/arrows-maximize.png";
 import Image from "next/image";
 
 // Lazy load chart components
@@ -291,12 +290,64 @@ export function ChartArea({
     return currentValues;
   };
 
+  // Get the latest date from all data
+  const getLatestDate = () => {
+    if (data.length === 0) return "";
+
+    const dates = data.map((item) => item.price_date_formatted);
+    const sortedDates = dates.sort();
+    const latestDate = sortedDates[sortedDates.length - 1];
+
+    // Format date as YYYY-MM for display
+    if (latestDate) {
+      const date = new Date(latestDate);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`;
+    }
+
+    return "";
+  };
+
   const currentValues = getCurrentValues();
 
   const [enabled, setEnabled] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isMaximized) {
+        setIsMaximized(false);
+      }
+    };
+
+    if (isMaximized) {
+      // Prevent scrolling when maximized
+      document.body.style.overflow = "hidden";
+
+      // Add event listener when maximized
+      document.addEventListener("keydown", handleKeyDown);
+    } else {
+      // Restore scrolling when not maximized
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMaximized]);
 
   return (
-    <div className="rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 bg-white/70">
+    <div
+      className={`rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 ${
+        isMaximized
+          ? "fixed top-0 left-0 w-full h-full bg-white z-50 "
+          : " bg-white/70"
+      }`}
+    >
       {/* Chart Header */}
       <div className="relative flex items-center justify-between border-b border-neutral-200 px-6 py-5 gap-6 max-md:flex-col max-md:items-start">
         <div className="flex flex-col gap-1">
@@ -304,15 +355,17 @@ export function ChartArea({
             {t.performanceChart}
           </h3>
           <p className="text-sm font-normal text-neutral-700">
-            {filteredAssets.length} assets
+            {filteredAssets.length} {t.assets}
             {allAvailableAssets.length > MAX_CHART_ASSETS &&
               selectedAssets.length === 0 && (
                 <span className="text-amber-600 font-medium">
                   {" "}
-                  • Showing top {MAX_CHART_ASSETS} by performance
+                  • {t.showingTopByPerformance} {MAX_CHART_ASSETS}{" "}
+                  {t.byPerformance}
                 </span>
               )}{" "}
-            • {t.dataThrough} • {showIndexed ? t.indexedValue : t.assetValue}
+            • {t.dataThrough} {getLatestDate()} •{" "}
+            {showIndexed ? t.indexedValue : t.assetValue}
           </p>
         </div>
         {/*Right Side*/}
@@ -338,12 +391,27 @@ export function ChartArea({
             {t.indexTo100}
           </p>
         </div>
-        <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">
-          <Image
-            src={ArrowsMaximize}
-            alt="maximize"
-            className="absolute md:top-2 w-4 h-4"
-          />
+        <button
+          className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center"
+          onClick={() => setIsMaximized(!isMaximized)}
+        >
+          {isMaximized ? (
+            <Image
+              src="/arrows-minimize.png"
+              width={16}
+              height={16}
+              alt="minimize"
+              className="absolute md:top-2 w-4 h-4"
+            />
+          ) : (
+            <Image
+              src="/arrows-maximize.png"
+              width={16}
+              height={16}
+              alt="maximize"
+              className="absolute md:top-2 w-4 h-4"
+            />
+          )}
         </button>
       </div>
 

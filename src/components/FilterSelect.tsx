@@ -75,8 +75,8 @@ export function FilterSelect({
             <span
               className={
                 selectedValues.length === 0
-                  ? ``
-                  : `border py-1 px-2 bg-neutral-100 border-neutral-200 rounded-4xl text-xs font-medium text-neutral-700`
+                  ? `py-0`
+                  : `border py-0.5 px-2 bg-neutral-100 border-neutral-200 rounded-4xl text-xs font-medium text-neutral-700`
               }
             >
               {selectedValues.length === 0
