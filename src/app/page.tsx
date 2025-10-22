@@ -25,6 +25,7 @@ import {
   filterData,
   groupDataByAsset,
   getFilteredOptions,
+  getRelatedFiltersForAssets,
 } from "@/lib/data";
 import { parseCSV, parseJSON } from "@/lib/csv-parser";
 import { debounce } from "@/lib/performance";
@@ -168,6 +169,20 @@ function HomePage() {
 
   const { categories, subcategories, experts, assets } = filterOptions;
 
+  // Calculate date range from data
+  const dateRange = useMemo(() => {
+    if (processedData.length === 0) {
+      return { minDate: "", maxDate: "" };
+    }
+
+    const dates = processedData.map((item) => item.price_date_formatted);
+    const sortedDates = dates.sort();
+    return {
+      minDate: sortedDates[0],
+      maxDate: sortedDates[sortedDates.length - 1],
+    };
+  }, [processedData]);
+
   // Auto-clear invalid selections when dependencies change
   useEffect(() => {
     if (selectedSubcategories.length > 0) {
@@ -234,13 +249,9 @@ function HomePage() {
     endDate,
   ]);
 
-  // Get available assets from filtered data
-  const availableAssets = useMemo(() => {
-    const assetSet = new Set(
-      filteredData.map((item: ProcessedAssetData) => item.asset_en)
-    );
-    return Array.from(assetSet).sort();
-  }, [filteredData]);
+  // Use assets from filterOptions instead of calculating from filteredData
+  // This ensures all available assets are shown regardless of current selections
+  const availableAssets = assets;
 
   // Auto-clear invalid filter selections when dependencies change
   useEffect(() => {
@@ -278,6 +289,32 @@ function HomePage() {
       }
     }
   }, [assets, selectedAssets]);
+
+  // Auto-select related filters when assets are selected
+  useEffect(() => {
+    if (selectedAssets.length > 0) {
+      const baseData = optimizedData?.data || processedData;
+      const relatedFilters = getRelatedFiltersForAssets(
+        baseData,
+        selectedAssets
+      );
+
+      // Auto-select related categories
+      if (relatedFilters.categories.length > 0) {
+        setSelectedCategories(relatedFilters.categories);
+      }
+
+      // Auto-select related subcategories
+      if (relatedFilters.subcategories.length > 0) {
+        setSelectedSubcategories(relatedFilters.subcategories);
+      }
+
+      // Auto-select related experts
+      if (relatedFilters.experts.length > 0) {
+        setSelectedExperts(relatedFilters.experts);
+      }
+    }
+  }, [selectedAssets, optimizedData, processedData]);
 
   // Debounced filter handlers with transitions for better performance
   const debouncedSetCategories = useCallback(
@@ -389,51 +426,37 @@ function HomePage() {
 
                   <div className="relative">
                     <p className="text-sm font-medium text-neutral-900">
-                      Date range
+                      {t.selectDateRange || "Date range"}
                     </p>
-                    <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-3 mt-2 focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100 text-neutral-700">
-                      <span className="flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2 text-neutral-700"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Select range
-                      </span>
-                    </button>
+                    <div className="mt-2">
+                      <DateRangeFilter
+                        startDate={startDate}
+                        endDate={endDate}
+                        onStartDateChange={setStartDate}
+                        onEndDateChange={setEndDate}
+                        minDate={dateRange.minDate}
+                        maxDate={dateRange.maxDate}
+                        language={language}
+                      />
+                    </div>
                   </div>
                 </>
               ) : (
                 <div className="relative">
                   <p className="text-sm font-medium text-neutral-900">
-                    Date range
+                    {t.selectDateRange || "Date range"}
                   </p>
-                  <button className="w-full px-3 py-2 text-left bg-neutral-50 border border-neutral-200 rounded-md text-sm  hover:border-brand-100 hover:border-2 mt-2 focus:ring-1 focus:border-brand-100 focus:ring-inset focus:ring-brand-100 text-neutral-700">
-                    <span className="flex items-center">
-                      <svg
-                        className="w-4 h-4 mr-2 text-neutral-700"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Select range
-                    </span>
-                  </button>
+                  <div className="mt-2">
+                    <DateRangeFilter
+                      startDate={startDate}
+                      endDate={endDate}
+                      onStartDateChange={setStartDate}
+                      onEndDateChange={setEndDate}
+                      minDate={dateRange.minDate}
+                      maxDate={dateRange.maxDate}
+                      language={language}
+                    />
+                  </div>
                 </div>
               )}
             </div>

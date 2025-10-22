@@ -76,7 +76,7 @@ export const translations = {
     currentValue: "Current value",
     performance: "Performance",
     assetsInSelection: "assets in current selection",
-    dataThrough: "Data through 2024-10",
+    dataThrough: "Data through",
     assetValue: "Asset value",
     indexTo100: "Index to 100 at release",
     startDate: "Start date",
@@ -118,7 +118,7 @@ export const translations = {
     currentValue: "Aktueller Wert",
     performance: "Performance",
     assetsInSelection: "Assets in aktueller Auswahl",
-    dataThrough: "Daten bis 2024-10",
+    dataThrough: "Daten bis",
     assetValue: "Asset-Wert",
     indexTo100: "Index auf 100 bei Veröffentlichung",
     startDate: "Startdatum",
@@ -160,7 +160,7 @@ export const translations = {
     currentValue: "Valeur actuelle",
     performance: "Performance",
     assetsInSelection: "actifs dans la sélection actuelle",
-    dataThrough: "Données jusqu'en 2024-10",
+    dataThrough: "Données jusqu'en",
     assetValue: "Valeur de l'actif",
     indexTo100: "Index à 100 à la sortie",
     startDate: "Date de début",
@@ -329,61 +329,12 @@ export function getFilteredOptions(
   experts: string[];
   assets: string[];
 } {
-  let filteredData = data;
-
-  if (currentFilters.categories.length > 0) {
-    const categorySet = new Set(currentFilters.categories);
-    filteredData = filteredData.filter((item) =>
-      categorySet.has(item.category_en)
-    );
-  }
-
-  if (currentFilters.experts.length > 0) {
-    const expertSet = new Set(currentFilters.experts);
-    filteredData = filteredData.filter((item) => expertSet.has(item.expert));
-  }
-
-  if (currentFilters.subcategories.length > 0) {
-    const subcategorySet = new Set(currentFilters.subcategories);
-    filteredData = filteredData.filter((item) =>
-      subcategorySet.has(item.subcategory_en)
-    );
-  }
-
+  // Show ALL options for all filters to allow full visibility
+  // The auto-selection logic will handle selecting related values
   const availableCategories = getUniqueValues(data, "category_en");
-
-  let subcategoryData = data;
-  if (currentFilters.categories.length > 0) {
-    const categorySet = new Set(currentFilters.categories);
-    subcategoryData = subcategoryData.filter((item) =>
-      categorySet.has(item.category_en)
-    );
-  }
-  if (currentFilters.experts.length > 0) {
-    const expertSet = new Set(currentFilters.experts);
-    subcategoryData = subcategoryData.filter((item) =>
-      expertSet.has(item.expert)
-    );
-  }
-  const availableSubcategories = getUniqueValues(
-    subcategoryData,
-    "subcategory_en"
-  );
-
-  let expertData = data;
-  if (currentFilters.categories.length > 0) {
-    const categorySet = new Set(currentFilters.categories);
-    expertData = expertData.filter((item) => categorySet.has(item.category_en));
-  }
-  if (currentFilters.subcategories.length > 0) {
-    const subcategorySet = new Set(currentFilters.subcategories);
-    expertData = expertData.filter((item) =>
-      subcategorySet.has(item.subcategory_en)
-    );
-  }
-  const availableExperts = getUniqueValues(expertData, "expert");
-
-  const availableAssets = getUniqueValues(filteredData, "asset_en");
+  const availableSubcategories = getUniqueValues(data, "subcategory_en");
+  const availableExperts = getUniqueValues(data, "expert");
+  const availableAssets = getUniqueValues(data, "asset_en");
 
   return {
     categories: availableCategories,
@@ -391,6 +342,29 @@ export function getFilteredOptions(
     experts: availableExperts,
     assets: availableAssets,
   };
+}
+
+// Get related filter values for selected assets
+export function getRelatedFiltersForAssets(
+  data: ProcessedAssetData[],
+  selectedAssets: string[]
+): {
+  categories: string[];
+  subcategories: string[];
+  experts: string[];
+} {
+  if (selectedAssets.length === 0) {
+    return { categories: [], subcategories: [], experts: [] };
+  }
+
+  const assetSet = new Set(selectedAssets);
+  const relatedData = data.filter((item) => assetSet.has(item.asset_en));
+
+  const categories = getUniqueValues(relatedData, "category_en");
+  const subcategories = getUniqueValues(relatedData, "subcategory_en");
+  const experts = getUniqueValues(relatedData, "expert");
+
+  return { categories, subcategories, experts };
 }
 
 // Clear all caches for memory management

@@ -290,6 +290,26 @@ export function ChartArea({
     return currentValues;
   };
 
+  // Get the latest date from all data
+  const getLatestDate = () => {
+    if (data.length === 0) return "";
+
+    const dates = data.map((item) => item.price_date_formatted);
+    const sortedDates = dates.sort();
+    const latestDate = sortedDates[sortedDates.length - 1];
+
+    // Format date as YYYY-MM for display
+    if (latestDate) {
+      const date = new Date(latestDate);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`;
+    }
+
+    return "";
+  };
+
   const currentValues = getCurrentValues();
 
   const [enabled, setEnabled] = useState(false);
@@ -311,7 +331,8 @@ export function ChartArea({
                   • Showing top {MAX_CHART_ASSETS} by performance
                 </span>
               )}{" "}
-            • {t.dataThrough} • {showIndexed ? t.indexedValue : t.assetValue}
+            • {t.dataThrough} {getLatestDate()} •{" "}
+            {showIndexed ? t.indexedValue : t.assetValue}
           </p>
         </div>
         {/*Right Side*/}

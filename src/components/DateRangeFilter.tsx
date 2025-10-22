@@ -23,8 +23,18 @@ export function DateRangeFilter({
   language,
 }: DateRangeFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [tempStartDate, setTempStartDate] = useState(startDate);
+  const [tempEndDate, setTempEndDate] = useState(endDate);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const t = translations[language];
+
+  // Sync temp state with props when dropdown opens
+  useEffect(() => {
+    if (isOpen) {
+      setTempStartDate(startDate);
+      setTempEndDate(endDate);
+    }
+  }, [isOpen, startDate, endDate]);
 
   // Auto-close dropdown when clicking outside
   useEffect(() => {
@@ -47,7 +57,15 @@ export function DateRangeFilter({
     };
   }, [isOpen]);
 
+  const handleApply = () => {
+    onStartDateChange(tempStartDate);
+    onEndDateChange(tempEndDate);
+    setIsOpen(false);
+  };
+
   const handleClearDates = () => {
+    setTempStartDate("");
+    setTempEndDate("");
     onStartDateChange("");
     onEndDateChange("");
     setIsOpen(false);
@@ -116,10 +134,10 @@ export function DateRangeFilter({
                 </label>
                 <input
                   type="date"
-                  value={startDate}
-                  onChange={(e) => onStartDateChange(e.target.value)}
+                  value={tempStartDate}
+                  onChange={(e) => setTempStartDate(e.target.value)}
                   min={minDate}
-                  max={endDate || maxDate}
+                  max={tempEndDate || maxDate}
                   className="w-full px-2 py-1 text-sm border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100"
                 />
               </div>
@@ -129,9 +147,9 @@ export function DateRangeFilter({
                 </label>
                 <input
                   type="date"
-                  value={endDate}
-                  onChange={(e) => onEndDateChange(e.target.value)}
-                  min={startDate || minDate}
+                  value={tempEndDate}
+                  onChange={(e) => setTempEndDate(e.target.value)}
+                  min={tempStartDate || minDate}
                   max={maxDate}
                   className="w-full px-2 py-1 text-sm border border-neutral-300 rounded focus:outline-none focus:ring-1 focus:ring-brand-100 focus:border-brand-100"
                 />
@@ -148,7 +166,7 @@ export function DateRangeFilter({
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={handleApply}
                 className="px-3 py-1 text-sm bg-brand-500 text-white rounded hover:bg-brand-600 transition-colors"
               >
                 {t.applyDates}
