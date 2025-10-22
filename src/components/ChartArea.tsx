@@ -313,9 +313,41 @@ export function ChartArea({
   const currentValues = getCurrentValues();
 
   const [enabled, setEnabled] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isMaximized) {
+        setIsMaximized(false);
+      }
+    };
+
+    if (isMaximized) {
+      // Prevent scrolling when maximized
+      document.body.style.overflow = "hidden";
+
+      // Add event listener when maximized
+      document.addEventListener("keydown", handleKeyDown);
+    } else {
+      // Restore scrolling when not maximized
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMaximized]);
 
   return (
-    <div className="rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 bg-white/70">
+    <div
+      className={`rounded-4xl shadow-filter p-2 border-8 border-neutral-200/40 ${
+        isMaximized
+          ? "fixed top-0 left-0 w-full h-full bg-white z-50 "
+          : " bg-white/70"
+      }`}
+    >
       {/* Chart Header */}
       <div className="relative flex items-center justify-between border-b border-neutral-200 px-6 py-5 gap-6 max-md:flex-col max-md:items-start">
         <div className="flex flex-col gap-1">
@@ -358,14 +390,27 @@ export function ChartArea({
             {t.indexTo100}
           </p>
         </div>
-        <button className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center">
-          <Image
-            src="/arrows-maximize.png"
-            width={16}
-            height={16}
-            alt="maximize"
-            className="absolute md:top-2 w-4 h-4"
-          />
+        <button
+          className="absolute top-2 right-3 items-center w-9 h-9 rounded-xl md:top-7 justify-center"
+          onClick={() => setIsMaximized(!isMaximized)}
+        >
+          {isMaximized ? (
+            <Image
+              src="/arrows-minimize.png"
+              width={16}
+              height={16}
+              alt="minimize"
+              className="absolute md:top-2 w-4 h-4"
+            />
+          ) : (
+            <Image
+              src="/arrows-maximize.png"
+              width={16}
+              height={16}
+              alt="maximize"
+              className="absolute md:top-2 w-4 h-4"
+            />
+          )}
         </button>
       </div>
 
